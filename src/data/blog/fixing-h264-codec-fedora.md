@@ -11,12 +11,12 @@ tags:
   - troubleshooting
   - multimedia
 description: A deep dive into why H.264 videos don't play on Fedora by default and how to swap "ffmpeg-free" for the full version.
-ogImage: /src/assets/images/fixing-h264-codec-fedora.png
+ogImage: ../../assets/images/fixing-h264-codec-fedora.png
 ---
 
 I freshly installed Fedora Linux Workstation 43 on my PC and tried to play a video. The video played, but it was blank. It turned out there was an issue with the missing video decoder required to run this video: **H.264**.
 
-![Retro style pixel art of a Linux terminal fixing codecs](/src/assets/images/fixing-h264-codec-fedora.png)
+![Retro style pixel art of a Linux terminal fixing codecs](../../assets/images/fixing-h264-codec-fedora.png)
 
 The issue is that this encoder is proprietary and does not come with Fedora by default due to licensing restrictions. To fix this, I had to dive into the world of FFmpeg and package management.
 
