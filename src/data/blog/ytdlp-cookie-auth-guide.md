@@ -55,7 +55,7 @@ Save the file (e.g., `youtube_cookies.txt`) directly into the folder where you r
 Now, instead of telling yt-dlp to look into the browser, we point it directly to our text file using the `--cookies` flag:
 
 ```powershell
-yt-dlp -x --audio-format mp3 --audio-quality 0 --cookies youtube_cookies.txt "media_link_to_be_download"
+yt-dlp --js-runtimes node --remote-components ejs:github --cookies-from-browser chrome -x --audio-format mp3 --audio-quality 0 "media_link_to_be_download"
 
 ```
 
