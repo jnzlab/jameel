@@ -1,4 +1,3 @@
-```markdown
 ---
 title: Fixing "No Wi-Fi Adapter Found" on Fedora with Intel AX201
 author: Jameel Ahmad
@@ -180,4 +179,3 @@ The Intel Wi-Fi 6 AX201 is an excellent wireless card, but its Linux drivers can
 By combining proper initramfs configuration, power management tweaks, and a systemd service fallback, I've achieved reliable Wi-Fi functionality across all reboots. This solution should persist across system updates and kernel changes.
 
 If you're experiencing similar issues with Intel wireless cards on Fedora or other Linux distributions, this comprehensive approach should help you achieve stable Wi-Fi connectivity.
-```
