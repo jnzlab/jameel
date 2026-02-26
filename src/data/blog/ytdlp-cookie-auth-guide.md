@@ -48,7 +48,7 @@ I use an extension called **"Get cookies.txt LOCALLY"**. It’s lightweight and 
 
 ### 2. Prepare Your Folder
 
-Save the file (e.g., `youtube_cookies.txt`) directly into the folder where you run your commands. In my case, that is `C:\Users\jameel\music`.
+Save the file (e.g., `cookies.txt`) directly into the folder where you run your commands. In my case, that is `C:\Users\jameel\music`.
 
 ### 3. Run the Correct Command
 
