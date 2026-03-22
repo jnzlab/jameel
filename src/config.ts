@@ -1,9 +1,9 @@
 export const SITE = {
-  website: "https://jnzlab.com/",
+  website: "https://jnzlab.io/",
   author: "Jameel Ahmad",
-  profile: "https://jnzlab.com/",
-  desc: "A minimal, responsive and SEO-friendly Astro blog theme.",
-  title: "Jameel",
+  profile: "https://jnzlab.io/",
+  desc: "Full-stack engineer (Next.js). AI & medical imaging research, open source, and LucidHire—portfolio and blog by Jameel Ahmad.",
+  title: "Jameel Ahmad",
   ogImage: "astropaper-og.jpg",
   lightAndDarkMode: true,
   postPerIndex: 4,

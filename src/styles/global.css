@@ -5,6 +5,9 @@
 
 :root,
 html[data-theme="light"] {
+  /* System stack: avoids Node fetching fonts.googleapis.com during astro dev/build */
+  --font-google-sans-code: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco,
+    Consolas, "Liberation Mono", monospace;
   --background: #fdfdfd;
   --foreground: #282728;
   --accent: #006cac;

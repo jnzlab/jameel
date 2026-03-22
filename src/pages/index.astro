@@ -7,16 +7,28 @@ import Socials from "@/components/Socials.astro";
 import LinkButton from "@/components/LinkButton.astro";
 import Card from "@/components/Card.astro";
 import getSortedPosts from "@/utils/getSortedPosts";
-import IconRss from "@/assets/icons/IconRss.svg";
 import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
 import { SITE } from "@/config";
 import { SOCIALS } from "@/constants";
+import { GITHUB_TOKEN } from "astro:env/server";
+import GitHubRepos from "@/components/GitHubRepos.astro";
+import { portfolioGithubRepos } from "@/data/portfolioGithubRepos";
+import { getGitHubReposCurated } from "@/utils/github";
 
 const posts = await getCollection("blog");
 
 const sortedPosts = getSortedPosts(posts);
 const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
 const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
+
+let githubRepos: Awaited<ReturnType<typeof getGitHubReposCurated>> = [];
+try {
+  githubRepos = await getGitHubReposCurated(portfolioGithubRepos, {
+    ...(GITHUB_TOKEN ? { token: GITHUB_TOKEN } : {}),
+  });
+} catch {
+  githubRepos = [];
+}
 ---
 
 <Layout>
@@ -42,22 +54,28 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
       </a> -->
 
       <p class="text-justify">
-        I have gained hands-on experience across web development, AI, and
-        databases, giving me strong exposure to multiple areas while still
-        growing toward deeper specialization. As a junior software engineer, I’m
-        adaptable, not tied to any specific framework, and always eager to learn
-        whatever tools or technologies a project requires. I enjoy stepping into
-        new challenges, upskilling quickly, and contributing wherever I can
-        create value.
+        I am a full-stack engineer with <strong>2+ years</strong> of
+        <strong>Next.js</strong> experience and a published paper on
+        <strong>AI-driven medical imaging</strong> (Swin Transformer, 24 skin
+        conditions). I build reliable systems end to end—backend, REST APIs, and
+        performant UIs—and ship from design to deployment. I am currently building
+        <strong>LucidHire</strong>, an AI-powered candidate screening platform.
       </p>
-      <p class="mt-2">
-        Read the blog posts or check
+      <p class="mt-2 text-justify">
+        For education, experience, projects, and open source, see the
         <LinkButton
           class="underline decoration-dashed underline-offset-4 hover:text-accent"
-          href="https://github.com/jnzlab/jameel#readme"
+          href="/about"
         >
-          README
-        </LinkButton> for more info.
+          About
+        </LinkButton>
+        page. Below are recent posts; the site repo lives on
+        <LinkButton
+          class="underline decoration-dashed underline-offset-4 hover:text-accent"
+          href="https://github.com/jnzlab/jameel"
+        >
+          GitHub
+        </LinkButton>.
       </p>
       {
         // only display if at least one social link is enabled
@@ -69,6 +87,8 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
         )
       }
     </section>
+
+    <GitHubRepos repos={githubRepos} profileUrl="https://github.com/jnzlab" />
 
     {
       featuredPosts.length > 0 && (

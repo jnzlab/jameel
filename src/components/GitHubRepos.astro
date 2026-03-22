@@ -1,0 +1,99 @@
+---
+import type { GitHubRepoDetail } from "@/utils/github";
+import LinkButton from "@/components/LinkButton.astro";
+
+type Props = {
+  repos: GitHubRepoDetail[];
+  profileUrl: string;
+};
+
+const { repos, profileUrl } = Astro.props;
+
+function formatPushedAt(iso: string | null): string | null {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+---
+
+<section id="github-repos" class="border-b border-border pt-12 pb-6">
+  <h2 class="text-2xl font-semibold tracking-wide">Highlighted on GitHub</h2>
+  {
+    repos.length > 0 ? (
+      <ul class="mt-4 space-y-6">
+        {repos.map(repo => {
+          const pushedLabel = formatPushedAt(repo.pushedAt);
+          return (
+          <li class="border-b border-border/80 pb-6 last:border-0 last:pb-0">
+            <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+              <a
+                href={repo.htmlUrl}
+                class="inline-block text-lg font-medium text-accent decoration-dashed underline-offset-4 hover:underline focus-visible:no-underline focus-visible:underline-offset-0"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {repo.name}
+              </a>
+              <span class="text-sm opacity-70">{repo.fullName}</span>
+              {repo.fork && (
+                <span class="rounded border border-border px-1.5 py-0.5 text-xs opacity-80">
+                  Fork
+                </span>
+              )}
+            </div>
+            <div class="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-sm opacity-80">
+              {repo.language && <span>{repo.language}</span>}
+              {pushedLabel && <span>Updated {pushedLabel}</span>}
+            </div>
+            {repo.description && (
+              <p class="mt-2 text-justify text-sm">{repo.description}</p>
+            )}
+            {repo.topics.length > 0 && (
+              <ul class="mt-2 flex flex-wrap gap-1.5" aria-label="Topics">
+                {repo.topics.map(topic => (
+                  <li>
+                    <span class="rounded-md bg-muted px-2 py-0.5 text-xs">
+                      {topic}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {repo.homepage && (
+              <p class="mt-2 text-sm">
+                <a
+                  href={repo.homepage}
+                  class="text-accent underline decoration-dashed underline-offset-4 hover:opacity-90"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {repo.homepage}
+                </a>
+              </p>
+            )}
+          </li>
+          );
+        })}
+      </ul>
+    ) : (
+      <p class="mt-4 text-sm opacity-90">
+        Repository details load from the GitHub API at build time. If nothing
+        appears, check your token or repo names in{" "}
+        <code class="rounded bg-muted px-1 py-0.5 text-xs">portfolioGithubRepos</code>
+        .
+        <LinkButton
+          href={profileUrl}
+          class="ms-1 underline decoration-dashed underline-offset-4 hover:text-accent"
+        >
+          View profile on GitHub
+        </LinkButton>
+        .
+      </p>
+    )
+  }
+</section>
