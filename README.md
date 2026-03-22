@@ -2,7 +2,7 @@
 
 Welcome to the source code of my personal website! This project serves as my digital home where I showcase my professional work, open-source contributions, and share my journey through technical blog posts.
 
-Live Site: **[jnzlab.com](https://jnzlab.com)**
+Live Site: **[jnzlab.com](https://jnzlab.io)**
 
 ## 👤 About This Project
 
