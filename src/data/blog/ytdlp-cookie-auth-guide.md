@@ -55,7 +55,7 @@ Save the file (e.g., `cookies.txt`) directly into the folder where you run your 
 Now, instead of telling yt-dlp to look into the browser, we point it directly to our text file using the `--cookies` flag:
 
 ```powershell
-yt-dlp --js-runtimes node --remote-components ejs:github --cookies-from-browser chrome -x --audio-format mp3 --audio-quality 0 "media_link_to_be_download"
+yt-dlp --js-runtimes node --remote-components ejs:github --cookies cookies.txt -x --audio-format mp3 --audio-quality 0 "media_link_to_be_download"
 
 ```
 
@@ -67,4 +67,4 @@ yt-dlp --js-runtimes node --remote-components ejs:github --cookies-from-browser 
 
 ## A Note on Security
 
-Your `youtube_cookies.txt` file is essentially a temporary key to your account. Never share this file with anyone else! Once you are done with your downloads, it is a good habit to delete the text file or move it to a secure location.
+Your `cookies.txt` file is essentially a temporary key to your account. Never share this file with anyone else! Once you are done with your downloads, it is a good habit to delete the text file or move it to a secure location.
