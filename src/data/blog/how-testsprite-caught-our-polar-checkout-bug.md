@@ -12,14 +12,14 @@ tags:
   - polar
   - debugging
 description: TestSprite surfaced an HTTP 500 on our billing checkout route. Here is how AI-driven E2E testing led us to the real culprit—invalid URL handling in the Polar Next.js helper—and the fix we shipped.
-ogImage: ../../assets/images/testsprite-polar-checkout-bug.png
+ogImage: ../../assets/images/testsprite-polar-checkout-bug.jpg
 ---
 
 I have been building **Lucid Hire**, a Next.js recruiter dashboard with **Clerk** auth, **Neon** Postgres, and **Polar** for subscriptions. The billing page lets recruiters click **Upgrade to Pro** and navigate to Polar-hosted checkout. In manual testing I had tunneling and env quirks, so I leaned on **TestSprite**—an MCP-connected E2E runner—to exercise the full app through a real browser session.
 
 One case kept failing: **TC013**, “Billing page remains usable after returning from external checkout.” The report was blunt: hitting `/api/billing/checkout?plan=pro` returned **HTTP 500** with a generic browser error page—no JSON, no stack trace in the UI.
 
-![Optional hero image for the post](../../assets/images/testsprite-polar-checkout-bug.png)
+![Optional hero image for the post](../../assets/images/testsprite-polar-checkout-bug.jpg)
 
 This post is about how that failure was actually a gift: TestSprite reproduced a path I had not fully validated, and chasing it led to a concrete bug in how we integrated Polar—not “Polar is down,” but **our route crashing before the SDK could even run**.
 
