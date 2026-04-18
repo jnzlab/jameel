@@ -2,7 +2,7 @@
 title: How I Fixed Testsprite Tests Getting Blocked by Clerk Auth in Next.js
 author: Jameel Ahmad
 pubDatetime: 2026-04-18T01:43:00+05:00
-slug: testing-nextjs-clerk-auth
+slug: testsprite-nextjs-clerk-auth
 featured: true
 draft: false
 tags:
