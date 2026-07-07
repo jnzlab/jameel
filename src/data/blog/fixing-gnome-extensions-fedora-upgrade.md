@@ -15,9 +15,7 @@ ogImage: ../../assets/images/fixing-gnome-extensions-fedora-upgrade.png
 ---
 I ran my usual `sudo dnf upgrade -y` to keep my Fedora Workstation up to date. It finished clean, no errors, no warnings. I rebooted, logged back in, and my desktop looked... off. The blur effect on my top panel and dash was gone, and the little speed indicator that always sits quietly telling me my network throughput had vanished too.
 
-<p align="center">
-  <img src="../../assets/images/fixing-gnome-extensions-fedora-upgrade.png" alt="Fedora desktop and app grid showing GNOME extensions and installed apps" />
-</p>
+![Fedora desktop and app grid showing GNOME extensions and installed apps](../../assets/images/fixing-gnome-extensions-fedora-upgrade.png)
 
 Both extensions I rely on daily — **Blur my Shell** and **Internet Speed Meter** — were just gone, as if I'd never installed them. Since a routine package upgrade had bumped me to a new GNOME Shell version under the hood, I figured the extensions were the casualty. Here's what was actually going on, and how I fixed it.
 
@@ -27,9 +25,7 @@ Both extensions I rely on daily — **Blur my Shell** and **Internet Speed Meter
 
 My first instinct was to open the **Extensions** app and check if they'd been disabled. They weren't — both `blur-my-shell@aunetx` and `InternetSpeedMeter@alshakib.dev` still showed up as enabled in GNOME's settings. That was confusing. If they were enabled, why weren't they rendering?
 
-<p align="center">
-  <img src="../../assets/images/blur-my-shell-extension-page.png" alt="Blur my Shell extension page showing it enabled with donation links" />
-</p>
+![Blur my Shell extension page showing it enabled with donation links](../../assets/images/blur-my-shell-extension-page.png)
 
 The extension's own page confirmed it was still toggled **ON**, which ruled out the simplest explanation. Something deeper was blocking them from loading.
 
@@ -54,9 +50,7 @@ dnf search gnome-shell-extension-speed
 
 All three searches came back empty. Neither **Blur my Shell** nor **Internet Speed Meter** are packaged in Fedora's repos — they only exist as downloads from extensions.gnome.org, installed per-user. That explains why a system-level `dnf upgrade` doesn't know or care about them at all; they live entirely outside the package manager's view.
 
-<p align="center">
-  <img src="../../assets/images/internet-speed-meter-extension-page.png" alt="Internet Speed Meter extension page showing download options and shell version selector" />
-</p>
+![Internet Speed Meter extension page showing download options and shell version selector](../../assets/images/internet-speed-meter-extension-page.png)
 
 ## The Fix, Step by Step
 
@@ -87,6 +81,4 @@ Reinstalling the files isn't quite the end of it. GNOME Shell needs a fresh star
 
 After the logout/login, both extensions loaded immediately: the blur was back on my panel and dash, and the speed meter was ticking away in the top bar again like nothing had happened.
 
-<p align="center">
-  <img src="../../assets/images/gnome-extensions-final-result.png" alt="Fedora desktop with blurred background across the top panel and app grid, with the internet speed meter visible in the top-right corner" />
-</p>
+![Fedora desktop with blurred background across the top panel and app grid, with the internet speed meter visible in the top-right corner](../../assets/images/gnome-extensions-final-result.png)
