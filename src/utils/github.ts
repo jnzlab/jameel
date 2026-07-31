@@ -59,7 +59,9 @@ async function fetchOneRepo(
     return null;
   }
   const json = (await res.json()) as GitHubRepoSingleApi;
-  return mapRepo(json);
+  const repo = mapRepo(json);
+  repo.homepage = ref.homepage ?? repo.homepage;
+  return repo;
 }
 
 /**
