@@ -3,6 +3,7 @@ import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
 import remarkToc from "remark-toc";
 import remarkCollapse from "remark-collapse";
+import rehypeExternalLinks, { type Options as ExternalLinksOptions } from "rehype-external-links";
 import {
   transformerNotationDiff,
   transformerNotationHighlight,
@@ -12,6 +13,24 @@ import { transformerFileName } from "./src/utils/transformers/fileName";
 import { SITE } from "./src/config";
 
 // https://astro.build/config
+const siteUrl = new URL(SITE.website);
+
+// Only treat links pointing outside this site as external.
+// Links to the site's own origin stay in the current tab.
+const externalLinksOptions: ExternalLinksOptions = {
+  target: "_blank",
+  rel: ["noopener", "noreferrer"],
+  test: node => {
+    const href = node.properties?.href;
+    if (typeof href !== "string") return false;
+    try {
+      return new URL(href, siteUrl).origin !== siteUrl.origin;
+    } catch {
+      return false;
+    }
+  },
+};
+
 export default defineConfig({
   site: SITE.website,
   integrations: [
@@ -21,6 +40,7 @@ export default defineConfig({
   ],
   markdown: {
     remarkPlugins: [remarkToc, [remarkCollapse, { test: "Table of contents" }]],
+    rehypePlugins: [[rehypeExternalLinks, externalLinksOptions]],
     shikiConfig: {
       // For more themes, visit https://shiki.style/themes
       themes: { light: "min-light", dark: "night-owl" },

@@ -8,6 +8,7 @@ import LinkButton from "@/components/LinkButton.astro";
 import Card from "@/components/Card.astro";
 import getSortedPosts from "@/utils/getSortedPosts";
 import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
+import IconDownload from "@/assets/icons/IconDownload.svg";
 import { SITE } from "@/config";
 import { SOCIALS } from "@/constants";
 import { GITHUB_TOKEN } from "astro:env/server";
@@ -53,28 +54,36 @@ try {
         <span class="sr-only">RSS Feed</span>
       </a> -->
 
-      <p class="text-justify">
+      <p>
         I am a <strong>full-stack developer</strong> based in Gujranwala,
         Pakistan, currently freelancing with <strong>Innovorus</strong> — owning
         client web projects end to end: architecture, backend, database, and
-        deployment. I've shipped <LinkButton
+        deployment.        I've shipped <LinkButton
           class="underline decoration-dashed underline-offset-4 hover:text-accent"
           href="https://lucidhire.io"
+          target="_blank"
+          rel="noopener noreferrer"
         ><strong>LucidHire</strong></LinkButton> (AI candidate screening),
         <LinkButton
           class="underline decoration-dashed underline-offset-4 hover:text-accent"
           href="https://pouchparlour.com"
+          target="_blank"
+          rel="noopener noreferrer"
         ><strong>Pouch Parlour</strong></LinkButton> (e-commerce storefront),
         <LinkButton
           class="underline decoration-dashed underline-offset-4 hover:text-accent"
           href="https://www.npmjs.com/package/@jnzlab/easy-ytdlp"
+          target="_blank"
+          rel="noopener noreferrer"
         ><strong>easy-ytdlp</strong></LinkButton> (a CLI tool), and
         <LinkButton
           class="underline decoration-dashed underline-offset-4 hover:text-accent"
-          href="https://hafiz-chaska-point.vercel.app"
+          href="https://hafizchaskapoint.vercel.app"
+          target="_blank"
+          rel="noopener noreferrer"
         ><strong>Hafiz Chaska Point</strong></LinkButton> (a live shop-status site).
       </p>
-      <p class="mt-2 text-justify">
+      <p class="mt-2">
         For education, experience, projects, and open source, see the
         <LinkButton
           class="underline decoration-dashed underline-offset-4 hover:text-accent"
@@ -86,6 +95,8 @@ try {
         <LinkButton
           class="underline decoration-dashed underline-offset-4 hover:text-accent"
           href="https://github.com/jnzlab/jameel"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           GitHub
         </LinkButton>.
@@ -99,6 +110,17 @@ try {
           </div>
         )
       }
+      <div class="mt-6 flex flex-wrap items-center gap-3">
+        <a
+          href={SITE.resumeUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 rounded-md border border-accent px-4 py-2 font-medium text-accent transition-colors hover:bg-accent hover:text-background"
+        >
+          <IconDownload class="inline-block size-4" />
+          Download Resume
+        </a>
+      </div>
     </section>
 
     <GitHubRepos repos={githubRepos} profileUrl="https://github.com/jnzlab" />

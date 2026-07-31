@@ -11,7 +11,7 @@ I hold a **Bachelor of Computer Science** from **GIFT University** (2021–2025)
 
 ## Contact
 
-- **Email:** [212370053@gift.edu.pk](mailto:212370053@gift.edu.pk)
+- **Email:** [jameel@jnzlab.io](mailto:jameel@jnzlab.io)
 - **Phone:** +92 349 7660082
 - **Location:** Gujranwala, Punjab, Pakistan
 - **Website:** [jnzlab.io](https://jnzlab.io/)
@@ -47,7 +47,7 @@ Built and deployed a full-stack e-commerce platform on **Cloudflare Workers** (v
 
 Built and published a **TypeScript** CLI tool that wraps yt-dlp with an interactive, plain-English question flow, removing the need to memorize CLI flags or install Python. Designed a pure-function flag-building layer that deterministically translates user answers into yt-dlp arguments, shared by both the interactive wizard and a non-interactive flag-driven mode, plus a self-contained binary distribution system that auto-downloads the correct platform binary from GitHub Releases with atomic file replacement. Solved YouTube's JavaScript-challenge (EJS) blocking by building a Node runtime discovery layer that scans nvm installations, and engineered a progress bar that correctly handles YouTube's multi-fragment DASH streams without freezing. Published and maintained on npm.
 
-### [Hafiz Chaska Point](https://hafiz-chaska-point.vercel.app) — Live Shop-Status Microsite (Production)
+### [Hafiz Chaska Point](https://hafizchaskapoint.vercel.app) — Live Shop-Status Microsite (Production)
 
 Built and deployed a live-status site for a local business, letting customers check in real time whether the shop is open. Designed a two-layer status system: Server Components render status via a 5-second revalidating cache for flash-free SSR, while the client polls with **SWR** for near-real-time updates, with optimistic UI in the admin panel and automatic rollback on failed requests. Implemented a PIN-based admin authorization system using constant-time comparison and IP rate limiting, and **Web Push** notifications (VAPID) with automatic cleanup of dead subscriptions.
 

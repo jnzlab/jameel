@@ -10,7 +10,7 @@ This site is built to represent my identity as a **Full Stack Developer**. It’
 
 ### Key Features:
 
-* **Portfolio:** A showcase of my work, including AI-powered candidate screening ([LucidHire](https://lucidhire.io)), e-commerce ([Pouch Parlour](https://pouchparlour.com)), a CLI tool ([easy-ytdlp](https://www.npmjs.com/package/@jnzlab/easy-ytdlp)), and live-status microsites ([Hafiz Chaska Point](https://hafiz-chaska-point.vercel.app)).
+* **Portfolio:** A showcase of my work, including AI-powered candidate screening ([LucidHire](https://lucidhire.io)), e-commerce ([Pouch Parlour](https://pouchparlour.com)), a CLI tool ([easy-ytdlp](https://www.npmjs.com/package/@jnzlab/easy-ytdlp)), and live-status microsites ([Hafiz Chaska Point](https://hafizchaskapoint.vercel.app)).
 * **Blog:** Insights on Next.js, TypeScript, Fedora Linux, and lessons from shipping production software.
 * **Performance:** Built with Astro for lightning-fast loading and optimal SEO.
 

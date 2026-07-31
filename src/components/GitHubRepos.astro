@@ -51,7 +51,7 @@ function formatPushedAt(iso: string | null): string | null {
               {pushedLabel && <span>Updated {pushedLabel}</span>}
             </div>
             {repo.description && (
-              <p class="mt-2 text-justify text-sm">{repo.description}</p>
+              <p class="mt-2 text-sm">{repo.description}</p>
             )}
             {repo.topics.length > 0 && (
               <ul class="mt-2 flex flex-wrap gap-1.5" aria-label="Topics">
@@ -88,6 +88,8 @@ function formatPushedAt(iso: string | null): string | null {
         .
         <LinkButton
           href={profileUrl}
+          target="_blank"
+          rel="noopener noreferrer"
           class="ms-1 underline decoration-dashed underline-offset-4 hover:text-accent"
         >
           View profile on GitHub

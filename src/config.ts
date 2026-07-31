@@ -3,6 +3,7 @@ export const SITE = {
   author: "Jameel Ahmad",
   profile: "https://jnzlab.io/",
   desc: "Full-stack developer (Next.js, TypeScript). Freelance at Innovorus; AI candidate screening, e-commerce, CLI tools, and open source—portfolio and blog by Jameel Ahmad.",
+  resumeUrl: "https://assets.jnzlab.io/resume.pdf",
   title: "Jameel Ahmad",
   ogImage: "astropaper-og.jpg",
   lightAndDarkMode: true,
