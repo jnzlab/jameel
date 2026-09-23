@@ -64,7 +64,7 @@ async function fetchOneRepo(
   if (!res.ok) {
     // eslint-disable-next-line no-console
     console.warn(
-      `[github] ${ref.owner}/${ref.repo}: ${res.status} ${res.statusText}${token ? "" : " (no GITHUB_TOKEN set)"}`,
+      `[github] ${ref.owner}/${ref.repo}: ${res.status} ${res.statusText}${token ? "" : " (no GITHUB_ACCESS_TOKEN set)"}`,
     );
     return null;
   }

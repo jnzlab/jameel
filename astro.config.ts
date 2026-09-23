@@ -84,7 +84,8 @@ export default defineConfig({
         context: "client",
         optional: true,
       }),
-      GITHUB_TOKEN: envField.string({
+      // Read-only GitHub token for repo metadata on the home page (optional).
+      GITHUB_ACCESS_TOKEN: envField.string({
         access: "secret",
         context: "server",
         optional: true,

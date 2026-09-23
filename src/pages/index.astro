@@ -1,6 +1,6 @@
 ---
 import { getCollection } from "astro:content";
-import { GITHUB_TOKEN } from "astro:env/server";
+import { GITHUB_ACCESS_TOKEN } from "astro:env/server";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
@@ -23,7 +23,7 @@ const repoRefs = projects.flatMap(p => (p.repo ? [p.repo] : []));
 let githubRepos: Awaited<ReturnType<typeof getGitHubReposCurated>> = [];
 try {
   githubRepos = await getGitHubReposCurated(repoRefs, {
-    ...(GITHUB_TOKEN ? { token: GITHUB_TOKEN } : {}),
+    ...(GITHUB_ACCESS_TOKEN ? { token: GITHUB_ACCESS_TOKEN } : {}),
   });
 } catch (error) {
   // eslint-disable-next-line no-console
