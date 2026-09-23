@@ -13,6 +13,7 @@ const { noMarginTop = false, class: className, ...attrs } = Astro.props;
 const currentYear = new Date().getFullYear();
 const email = SOCIALS.find(s => s.name === "Mail")?.href.replace("mailto:", "");
 const profiles = SOCIALS.filter(s => s.name !== "Mail");
+const onContactPage = Astro.url.pathname.replace(/\/$/, "") === "/contact";
 ---
 
 <footer
@@ -24,12 +25,22 @@ const profiles = SOCIALS.filter(s => s.name !== "Mail");
       <p class="type-meta text-ink-soft">Contact</p>
       {
         email && (
-          <a
-            href={`mailto:${email}`}
-            class="type-heading mt-3 inline-block text-[clamp(1.4rem,4.2vw,2.75rem)] break-all underline decoration-marigold decoration-[3px] underline-offset-[0.18em] transition-colors hover:text-cobalt"
-          >
-            {email}
-          </a>
+          <>
+            {/* The address is the headline, but it opens the on-site form so visitors stay here */}
+            <a
+              href={onContactPage ? "#contact-form" : "/contact"}
+              aria-label={`Send me a message (${email})`}
+              class="type-heading mt-3 inline-block text-[clamp(1.4rem,4.2vw,2.75rem)] break-all underline decoration-marigold decoration-[3px] underline-offset-[0.18em] transition-colors hover:text-cobalt"
+            >
+              {email}
+            </a>
+            <p class="type-meta mt-3 text-ink-soft">
+              Opens the contact form ·{" "}
+              <a href={`mailto:${email}`} class="link-ink text-ink">
+                Use your mail app
+              </a>
+            </p>
+          </>
         )
       }
       <p class="mt-4 max-w-md text-ink-soft">

@@ -1,6 +1,7 @@
 import { defineConfig, envField } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
+import vercel from "@astrojs/vercel";
 import { unified } from "@astrojs/markdown-remark";
 import remarkToc from "remark-toc";
 import remarkCollapse from "remark-collapse";
@@ -34,6 +35,9 @@ const externalLinksOptions: ExternalLinksOptions = {
 
 export default defineConfig({
   site: SITE.website,
+  // Pages stay prerendered; the adapter only serves on-demand routes such as
+  // Astro Actions (contact form, post feedback).
+  adapter: vercel(),
   // Astro 7 defaults to JSX-style whitespace stripping ("jsx"), which glues
   // adjacent inline elements together in our templates. Keep HTML semantics.
   compressHTML: true,
@@ -83,6 +87,51 @@ export default defineConfig({
       GITHUB_TOKEN: envField.string({
         access: "secret",
         context: "server",
+        optional: true,
+      }),
+      // Contact form + post feedback. All optional so the site still builds
+      // without them; the actions report "not configured" instead.
+      SUPABASE_URL: envField.string({
+        access: "secret",
+        context: "server",
+        optional: true,
+      }),
+      SUPABASE_KEY: envField.string({
+        access: "secret",
+        context: "server",
+        optional: true,
+      }),
+      RESEND_API_KEY: envField.string({
+        access: "secret",
+        context: "server",
+        optional: true,
+      }),
+      // Sender for notification emails; jnzlab.io is verified in Resend.
+      RESEND_FROM: envField.string({
+        access: "secret",
+        context: "server",
+        default: "jnzlab.io <notifications@jnzlab.io>",
+      }),
+      CONTACT_TO_EMAIL: envField.string({
+        access: "secret",
+        context: "server",
+        default: "jameel@jnzlab.io",
+      }),
+      TURNSTILE_SECRET: envField.string({
+        access: "secret",
+        context: "server",
+        optional: true,
+      }),
+      // Comma-separated frontend hostnames siteverify must report. Defaults to
+      // the SITE hostname (plus localhost in dev only).
+      TURNSTILE_HOSTNAMES: envField.string({
+        access: "secret",
+        context: "server",
+        optional: true,
+      }),
+      TURNSTILE_SITE_KEY: envField.string({
+        access: "public",
+        context: "client",
         optional: true,
       }),
     },

@@ -11,6 +11,7 @@ import ShareLinks from "@/components/ShareLinks.astro";
 import BackButton from "@/components/BackButton.astro";
 import BackToTopButton from "@/components/BackToTopButton.astro";
 import TableOfContents from "@/components/post/TableOfContents.astro";
+import PostFeedback from "@/components/post/PostFeedback.astro";
 import { getPath } from "@/utils/getPath";
 import { slugifyStr } from "@/utils/slugify";
 import { readingTime } from "@/utils/readingTime";
@@ -238,6 +239,7 @@ const olderPost =
               </ul>
             </div>
 
+            <PostFeedback slug={post.id} class="my-4" />
 
             <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
               <ShareLinks />

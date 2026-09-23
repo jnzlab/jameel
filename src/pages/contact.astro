@@ -1,0 +1,114 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import ContactForm from "@/components/contact/ContactForm.astro";
+import { SITE } from "@/config";
+import { SOCIALS } from "@/constants";
+
+const email =
+  SOCIALS.find(s => s.name === "Mail")?.href.replace("mailto:", "") ?? "jameel@jnzlab.io";
+
+const topics = [
+  {
+    label: "Freelance projects",
+    body: "What you're building, where it stands, and when you need it.",
+  },
+  {
+    label: "Full-time roles",
+    body: "The team, the stack, and a link to the listing.",
+  },
+  {
+    label: "Questions about a post",
+    body: "Which post, what you tried, and what you ran into.",
+  },
+];
+---
+
+<Layout
+  title={`Contact | ${SITE.title}`}
+  description="Send Jameel Ahmad a message about a freelance project, a full-time role, or a question about one of his posts."
+>
+  <Header />
+  <main id="main-content" class="app-layout pb-24">
+    <div
+      class="grid gap-x-16 gap-y-12 pt-12 sm:pt-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,33rem)] lg:grid-rows-[auto_1fr] lg:pt-20"
+    >
+      <section aria-labelledby="contact-title" class="min-w-0 lg:col-start-1 lg:row-start-1">
+        <p class="type-meta text-ink-soft">Contact · Open to opportunities</p>
+        <h1
+          id="contact-title"
+          class="type-display mt-6 max-w-[14ch] text-[clamp(2.1rem,5vw,3.5rem)]"
+        >
+          Tell me what you're working on.
+        </h1>
+        <p class="mt-8 max-w-[52ch] text-lg leading-relaxed text-ink-soft">
+          I'm freelancing at
+          <a href="https://www.innovorus.com/" target="_blank" rel="noopener noreferrer" class="link-ink text-ink">Innovorus</a>
+          and open to new opportunities. Send me a note about any of these:
+        </p>
+
+        <ul class="topics mt-8 max-w-[52ch]">
+          {
+            topics.map(topic => (
+              <li class="topic relative ps-8 pb-6 last:pb-0">
+                <span class="topic-node" aria-hidden="true" />
+                <p class="font-semibold text-ink">{topic.label}</p>
+                <p class="mt-1 text-ink-soft">{topic.body}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <div class="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:pt-2">
+        <ContactForm email={email} />
+      </div>
+
+      <aside aria-label="Replies and email" class="min-w-0 lg:col-start-1 lg:row-start-2">
+        <dl class="grid max-w-[52ch] gap-6 border-t border-line pt-8">
+          <div>
+            <dt class="type-meta text-ink-soft">What happens next</dt>
+            <dd class="mt-2 text-ink">
+              I read every message myself and reply by email from
+              <span class="font-medium whitespace-nowrap">{email}</span>.
+            </dd>
+          </div>
+          <div>
+            <dt class="type-meta text-ink-soft">Prefer your mail app?</dt>
+            <dd class="mt-2 text-ink">
+              Write to <a href={`mailto:${email}`} class="link-ink font-medium">{email}</a>
+            </dd>
+          </div>
+        </dl>
+      </aside>
+    </div>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  /* Topics sit on a short branch rail, same language as the commit graph */
+  .topic::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0.3125rem;
+    top: 0.9rem;
+    bottom: -0.4rem;
+    width: 2px;
+    background: var(--line);
+  }
+  .topic:last-child::before {
+    display: none;
+  }
+  .topic-node {
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0.45rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 999px;
+    border: 2px solid var(--ink-soft);
+    background: var(--paper);
+  }
+</style>
