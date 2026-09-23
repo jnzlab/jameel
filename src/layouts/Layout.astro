@@ -163,7 +163,14 @@ const structuredData = {
     </script>
   </head>
   <body>
+    {/*
+      Opt out of Cloudflare Email Address Obfuscation. Its decoder only runs on a
+      full page load, so pages swapped in by view transitions showed
+      "[email protected]" instead of the address.
+    */}
+    <Fragment set:html="<!--email_off-->" />
     <slot />
+    <Fragment set:html="<!--email_on-->" />
 
     <!-- Load full theme logic -->
     <script src="../scripts/theme.ts"></script>
