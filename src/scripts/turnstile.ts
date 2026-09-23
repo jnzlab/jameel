@@ -11,6 +11,11 @@
  * Before submitting, `await widget?.ready()` so a fast submit doesn't race the
  * token (resolves false if no token arrives within the timeout).
  * Returns null when no site key is configured, so forms still render in dev.
+ *
+ * The widget is a cross-origin iframe, so its inside can't be styled. Instead the
+ * helper wraps it (.ts__frame) with a status line (.ts__status) and sets
+ * container[data-state] = checking | interactive | verified | expired | error;
+ * global.css collapses the Cloudflare box once verified and shows our own status.
  */
 import { TURNSTILE_SITE_KEY } from "astro:env/client";
 
@@ -61,6 +66,37 @@ export async function mountTurnstile(
   const api = await loadScript();
   const theme = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
 
+  const frame = document.createElement("div");
+  frame.className = "ts__frame";
+  const status = document.createElement("p");
+  status.className = "ts__status type-meta";
+  status.setAttribute("role", "status");
+  container.classList.add("ts");
+  container.replaceChildren(frame, status);
+
+  const STATUS: Record<string, string> = {
+    checking: "",
+    interactive: "",
+    verified: "✓ Verified, not a bot",
+    expired: "Verification expired. Checking again…",
+    error: "The spam check couldn't load. Reload the page, or email me instead.",
+  };
+  let collapseTimer: ReturnType<typeof setTimeout> | undefined;
+  const setState = (state: keyof typeof STATUS) => {
+    clearTimeout(collapseTimer);
+    const apply = () => {
+      container.dataset.state = state;
+      status.textContent = STATUS[state];
+    };
+    // Let Cloudflare's own "Success!" show for a beat before collapsing it.
+    if (state === "verified" && container.dataset.state === "interactive") {
+      collapseTimer = setTimeout(apply, 900);
+    } else {
+      apply();
+    }
+  };
+  setState("checking");
+
   let hasToken = false;
   let waiters: Array<(ok: boolean) => void> = [];
   const settle = (ok: boolean) => {
@@ -71,16 +107,27 @@ export async function mountTurnstile(
     }
   };
 
-  const widgetId = api.render(container, {
+  const widgetId = api.render(frame, {
     sitekey: TURNSTILE_SITE_KEY,
     action,
     theme,
     size: "flexible",
     // Only shows a checkbox when Cloudflare actually needs an interaction.
     appearance: "interaction-only",
-    callback: () => settle(true),
-    "expired-callback": () => settle(false),
-    "error-callback": () => settle(false),
+    "refresh-expired": "auto",
+    callback: () => {
+      settle(true);
+      setState("verified");
+    },
+    "before-interactive-callback": () => setState("interactive"),
+    "expired-callback": () => {
+      settle(false);
+      setState("expired");
+    },
+    "error-callback": () => {
+      settle(false);
+      setState("error");
+    },
   });
   return {
     ready: (timeoutMs = 8000) =>
@@ -92,6 +139,7 @@ export async function mountTurnstile(
           }),
     reset: () => {
       settle(false);
+      setState("checking");
       api.reset(widgetId);
     },
     remove: () => api.remove(widgetId),

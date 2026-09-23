@@ -307,6 +307,10 @@ const { slug, class: className } = Astro.props;
   .feedback__form-status:empty {
     display: none;
   }
+  /* While Turnstile checks silently it has nothing to show: cancel the flex gap. */
+  .feedback__turnstile[data-state="checking"] {
+    margin-top: -1.25rem;
+  }
 
   .feedback__trap {
     position: absolute;

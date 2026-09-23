@@ -173,6 +173,34 @@ html[data-theme="dark"] {
   letter-spacing: 0.01em;
 }
 
+/* ===== Cloudflare Turnstile (see src/scripts/turnstile.ts) =====
+ * The widget is a cross-origin iframe; we only shape its frame and swap it for
+ * our own status line once verified. Cloudflare's logo and links stay visible
+ * whenever the widget itself is shown. */
+.ts {
+  display: grid;
+  gap: 0.5rem;
+}
+.ts__frame:not(:empty) {
+  overflow: hidden;
+  border-radius: 0.625rem;
+  line-height: 0;
+}
+.ts[data-state="verified"] .ts__frame {
+  display: none;
+}
+.ts__status {
+  color: var(--ink-soft);
+  text-transform: none;
+  letter-spacing: 0.01em;
+}
+.ts__status:empty {
+  display: none;
+}
+.ts[data-state="verified"] .ts__status {
+  color: var(--ink);
+}
+
 .active-nav {
   @apply text-ink;
   &::after {
