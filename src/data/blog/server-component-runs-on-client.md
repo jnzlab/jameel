@@ -1,7 +1,8 @@
 ---
-title: Your "Server Component" Is Running on the Client (And You Have No Idea)
+title: "Why Your Next.js Server Component Runs on the Client"
 author: Jameel Ahmad
 pubDatetime: 2026-04-14T01:00:00+05:00
+modDatetime: 2026-09-23T00:00:00Z
 slug: server-component-runs-on-client
 featured: false
 draft: false
@@ -10,7 +11,7 @@ tags:
   - react
   - server-components
   - debugging
-description: The cases where Next.js developers are convinced their code runs on the server — but it silently runs on the client instead.
+description: "Four ways a Next.js App Router Server Component ends up running on the client, from imports inside \"use client\" files to props that leak data."
 ogImage: ../../assets/images/server-component-runs-on-client.jpg
 ---
 
@@ -261,3 +262,5 @@ Stop thinking of Server vs. Client as a property of individual files. Think of i
 - Server Actions are public endpoints, not private functions.
 
 Once that clicks, the mask reveal makes sense. Your "Server Component" was always the client. You just hadn't pulled it off yet.
+
+If you are wiring a database into a Next.js app, I cover keeping local and production data apart in [Supabase local development with Podman](/posts/nextjs-supabase-podman-dual-environments/). And if you want a second pair of eyes on a Next.js codebase, [I take on freelance work](/hire/).

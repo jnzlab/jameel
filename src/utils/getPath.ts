@@ -27,10 +27,10 @@ export function getPath(
   const blogId = id.split("/");
   const slug = blogId.length > 0 ? blogId.slice(-1) : blogId;
 
-  // If not inside the sub-dir, simply return the file path
-  if (!pathSegments || pathSegments.length < 1) {
-    return [basePath, slug].join("/");
-  }
+  const segments =
+    !pathSegments || pathSegments.length < 1 ? [basePath, slug] : [basePath, ...pathSegments, slug];
+  const path = segments.join("/");
 
-  return [basePath, ...pathSegments, slug].join("/");
+  // Page URLs end in a slash (trailingSlash: "always"); route params don't.
+  return includeBase ? `${path}/` : path;
 }

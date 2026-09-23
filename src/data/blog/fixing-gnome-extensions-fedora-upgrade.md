@@ -1,7 +1,8 @@
 ---
-title: How a Fedora Upgrade Silently Killed My GNOME Extensions (And How I Brought Them Back)
+title: "GNOME Extensions Not Working After Fedora Upgrade? Fix It"
 author: Jameel Ahmad
 pubDatetime: 2026-07-07T11:52:00+05:00
+modDatetime: 2026-09-23T00:00:00Z
 slug: fixing-gnome-extensions-fedora-upgrade
 featured: true
 draft: false
@@ -10,14 +11,14 @@ tags:
   - fedora
   - gnome
   - troubleshooting
-description: A walkthrough of why blur-my-shell and Internet Speed Meter broke after a routine dnf upgrade, and the two-part fix that brought them back to life.
+description: "Blur my Shell and Internet Speed Meter vanished after a Fedora dnf upgrade. Why disable-user-extensions got flipped, and the two-step fix to restore them."
 ogImage: ../../assets/images/fixing-gnome-extensions-fedora-upgrade.png
 ---
 I ran my usual `sudo dnf upgrade -y` to keep my Fedora Workstation up to date. It finished clean, no errors, no warnings. I rebooted, logged back in, and my desktop looked... off. The blur effect on my top panel and dash was gone, and the little speed indicator that always sits quietly telling me my network throughput had vanished too.
 
 ![Fedora desktop and app grid showing GNOME extensions and installed apps](../../assets/images/fixing-gnome-extensions-fedora-upgrade.png)
 
-Both extensions I rely on daily — **Blur my Shell** and **Internet Speed Meter** — were just gone, as if I'd never installed them. Since a routine package upgrade had bumped me to a new GNOME Shell version under the hood, I figured the extensions were the casualty. Here's what was actually going on, and how I fixed it.
+Both extensions I rely on daily — **Blur my Shell** and **Internet Speed Meter** — were just gone, as if I'd never installed them. Since a routine package upgrade had bumped me to a new GNOME Shell version under the hood, I figured the extensions were the casualty. In short: GNOME extensions not working after a Fedora upgrade, with no error message anywhere. Here's what was actually going on, and how I fixed it.
 
 ## Table of contents
 
@@ -82,3 +83,5 @@ Reinstalling the files isn't quite the end of it. GNOME Shell needs a fresh star
 After the logout/login, both extensions loaded immediately: the blur was back on my panel and dash, and the speed meter was ticking away in the top bar again like nothing had happened.
 
 ![Fedora desktop with blurred background across the top panel and app grid, with the internet speed meter visible in the top-right corner](../../assets/images/gnome-extensions-final-result.png)
+
+This isn't the first time Fedora has needed some hands-on fixing on my machines. If you hit other issues, see how I fixed [Intel AX201 Wi-Fi not working on Fedora](/posts/fixing-wifi-intel-ax201-fedora/) and [missing H.264 codecs](/posts/fixing-h264-codec-fedora/).

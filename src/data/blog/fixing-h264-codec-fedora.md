@@ -1,7 +1,8 @@
 ---
-title: How I Fixed Missing H.264 Codecs on a Fresh Fedora Install
+title: "Fedora 43 H.264 Codec Missing? Swap ffmpeg-free for FFmpeg"
 author: Jameel Ahmad
 pubDatetime: 2026-01-09T01:43:00+05:00
+modDatetime: 2026-09-23T00:00:00Z
 slug: fixing-h264-codec-fedora
 featured: false
 draft: false
@@ -10,7 +11,7 @@ tags:
   - fedora
   - troubleshooting
   - multimedia
-description: A deep dive into why H.264 videos don't play on Fedora by default and how to swap "ffmpeg-free" for the full version.
+description: "Fedora 43 H.264 codec missing and videos play as a blank screen? Enable RPM Fusion, swap ffmpeg-free for full FFmpeg and fix the playback lag."
 ogImage: ../../assets/images/fixing-h264-codec-fedora.png
 ---
 
@@ -95,3 +96,5 @@ sudo dnf update @multimedia --setopt="install_weak_deps=False" --exclude=Package
 * **`--exclude=PackageKit-gstreamer-plugin`**: This stops the GUI software store from interfering with our manual codec setup.
 
 After running this, the H.264 videos played perfectly smooth!
+
+If you are on a fresh Fedora install, two other posts might save you some time: my fix for [Intel AX201 Wi-Fi not working on Fedora](/posts/fixing-wifi-intel-ax201-fedora/), and what to do when [GNOME extensions stop working after a Fedora upgrade](/posts/fixing-gnome-extensions-fedora-upgrade/).

@@ -18,7 +18,11 @@ const max = Math.max(...tags.map(t => t.count), 1);
 const postCount = posts.filter(p => !p.data.draft).length;
 ---
 
-<Layout title={`Tags | ${SITE.title}`}>
+<Layout
+  title={`Tags | ${SITE.title}`}
+  description="Every topic Jameel Ahmad has written about, most covered first."
+  noindex
+>
   <Header />
   <Main
     pageTitle="Tags"

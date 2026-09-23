@@ -40,7 +40,10 @@ const sectionClass =
   "grid gap-8 border-t border-line py-16 sm:py-24 md:grid-cols-[11rem_minmax(0,1fr)] md:gap-12 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-16";
 ---
 
-<Layout scrollSmooth>
+<Layout
+  title="Jameel Ahmad | Software Engineer in Gujranwala, Pakistan"
+  scrollSmooth
+>
   <Header />
   <main id="main-content" data-layout="index" class="app-layout pb-8 sm:pb-12">
     <Hero />
@@ -50,9 +53,15 @@ const sectionClass =
         id="work-title"
         title="Selected work"
         meta={plural(projects.length, "project")}
-        link={{ href: "/about", label: "Full background" }}
+        link={{ href: "/about/", label: "Full background" }}
       />
-      <WorkList projects={projects} repos={githubRepos} />
+      <div class="min-w-0">
+        <WorkList projects={projects} repos={githubRepos} />
+        <p class="mt-10 text-ink-soft">
+          Need something like this built?
+          <a href="/hire/" class="link-ink text-ink">How I work with clients</a>.
+        </p>
+      </div>
     </section>
 
     <section id="writing" aria-labelledby="writing-title" class={sectionClass}>
@@ -60,7 +69,7 @@ const sectionClass =
         id="writing-title"
         title="Writing"
         meta={`Latest ${latestPosts.length} of ${sortedPosts.length} posts`}
-        link={{ href: "/posts", label: "All writing" }}
+        link={{ href: "/posts/", label: "All writing" }}
       />
       <div class="min-w-0">
         <CommitLog posts={latestPosts} milestones={milestones} />

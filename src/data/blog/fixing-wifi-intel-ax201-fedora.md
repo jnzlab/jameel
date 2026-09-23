@@ -1,7 +1,8 @@
 ---
-title: Fixing "No Wi-Fi Adapter Found" on Fedora with Intel AX201
+title: "Fix Intel AX201 WiFi Not Working on Fedora (iwlwifi)"
 author: Jameel Ahmad
 pubDatetime: 2026-02-25T20:10:00+05:00
+modDatetime: 2026-09-23T00:00:00Z
 slug: fixing-wifi-intel-ax201-fedora
 featured: false
 draft: false
@@ -11,7 +12,7 @@ tags:
   - troubleshooting
   - wifi
   - hardware
-description: How I solved the persistent Intel Wi-Fi 6 AX201 adapter detection issue on Fedora Linux 43 after multiple reboots.
+description: "Intel AX201 Wi-Fi vanished on Fedora 43 with \"No Wi-Fi Adapter Found\" and iwlwifi error -110. The firmware, initramfs and power_save fix that stuck."
 ogImage: ../../assets/images/fixing-wifi-intel-ax201-fedora.png
 ---
 
@@ -19,7 +20,7 @@ I was working on my Lenovo ThinkPad X13 Yoga Gen 2 running Fedora Linux 43 when 
 
 ![Retro style pixel art of a Linux terminal fixing Wi-Fi](../../assets/images/fixing-wifi-intel-ax201-fedora.png)
 
-After some investigation, I discovered this was a common issue with Intel AX201 wireless cards on Linux, particularly affecting Fedora users. The driver would work sometimes but fail to initialize properly on boot.
+After some investigation, I discovered this was a common issue with Intel AX201 wireless cards on Linux, particularly affecting Fedora users. The driver would work sometimes but fail to initialize properly on boot, and the kernel log showed `iwlwifi 0000:00:14.3: probe with driver iwlwifi failed with error -110`.
 
 ## Table of contents
 
@@ -179,3 +180,5 @@ The Intel Wi-Fi 6 AX201 is an excellent wireless card, but its Linux drivers can
 By combining proper initramfs configuration, power management tweaks, and a systemd service fallback, I've achieved reliable Wi-Fi functionality across all reboots. This solution should persist across system updates and kernel changes.
 
 If you're experiencing similar issues with Intel wireless cards on Fedora or other Linux distributions, this comprehensive approach should help you achieve stable Wi-Fi connectivity.
+
+If you are setting up a fresh Fedora install, you may also run into [missing H.264 codecs](/posts/fixing-h264-codec-fedora/), which is the next thing I had to fix on mine.

@@ -1,0 +1,373 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import AboutSection from "@/components/about/AboutSection.astro";
+import IconMail from "@/assets/icons/IconMail.svg";
+import { SITE } from "@/config";
+import { AREA, breadcrumbSchema, serviceSchema } from "@/utils/seo";
+
+const email = "jameel@jnzlab.io";
+const pageUrl = new URL("/hire/", SITE.website).href;
+const description =
+  "Hire Jameel Ahmad, a freelance full-stack developer for Next.js apps, SaaS MVPs, e-commerce and AI features. Remote, worldwide. Get in touch.";
+
+const ext = { target: "_blank", rel: "noopener noreferrer" };
+
+/* Each service points at something real I've shipped or written about. */
+const services = [
+  {
+    title: "Web apps, SaaS and MVPs with Next.js",
+    body: "A first version you can put in front of users: sign-in, roles, a database, the core workflow, and billing or usage limits if the product needs them. I build on Next.js with the App Router, Server Components and Server Actions.",
+    proof: {
+      text: "LucidHire is multi-tenant, with Clerk auth, org-scoped roles and plan-based usage enforcement.",
+      label: "lucidhire.io",
+      href: "https://lucidhire.io",
+    },
+  },
+  {
+    title: "E-commerce",
+    body: "Storefronts with a checkout that doesn't get in the way, order records you can trust, and an admin dashboard for products, stock and orders.",
+    proof: {
+      text: "Pouch Parlour has guest-first checkout, order snapshots that stay correct after catalog edits, low-stock alerts, and an image worker that cut a sample 3.9 MB upload to ~314 KB.",
+      label: "pouchparlour.com",
+      href: "https://pouchparlour.com",
+    },
+  },
+  {
+    title: "AI features and LLM integration",
+    body: "Structured extraction from documents, semantic search, ranking and summaries, wired into your app with the Vercel AI SDK and run as background jobs when they take longer than a request should.",
+    proof: {
+      text: "LucidHire extracts CV data with Gemini, narrows candidates with pgvector search, then re-ranks a top-20 shortlist with an LLM.",
+      label: "lucidhire.io",
+      href: "https://lucidhire.io",
+    },
+  },
+  {
+    title: "APIs, databases and deployment",
+    body: "API routes, schemas and migrations with Drizzle on Postgres (Neon) or Cloudflare D1, background jobs with Trigger.dev, and deployment on Vercel or Cloudflare Workers.",
+    proof: {
+      text: "Hafiz Chaska Point runs on Vercel with a revalidating cache, Web Push notifications and a rate-limited admin.",
+      label: "hafizchaskapoint.vercel.app",
+      href: "https://hafizchaskapoint.vercel.app",
+    },
+  },
+  {
+    title: "Fixing and maintaining existing Next.js apps",
+    body: "If you already have an app that is slow, breaking in production or hard to change, I can find out why and fix it. I write up the bugs I track down, so you can see how I work before we talk.",
+    proof: {
+      text: "For example: a Server Component that was quietly running on the client.",
+      label: "Read the write-up",
+      href: "/posts/server-component-runs-on-client/",
+    },
+  },
+];
+
+const stack = [
+  { area: "Frontend", items: ["Next.js", "React", "TypeScript", "Tailwind CSS", "shadcn/ui", "SWR"] },
+  {
+    area: "Backend & data",
+    items: ["Node.js", "Drizzle ORM", "PostgreSQL (Neon, pgvector)", "Supabase", "Cloudflare D1", "Upstash Redis"],
+  },
+  { area: "Auth & AI", items: ["Clerk (RBAC)", "Vercel AI SDK", "Google Gemini"] },
+  {
+    area: "Hosting & jobs",
+    items: ["Vercel", "Cloudflare Workers (OpenNext)", "Cloudflare R2", "Trigger.dev"],
+  },
+];
+
+const steps = [
+  {
+    title: "A short call",
+    body: "You tell me what you're building, who it's for and when you need it. I ask questions until I understand the problem, not just the feature list.",
+  },
+  {
+    title: "Scope and estimate",
+    body: "I write down what the first version includes, what it leaves out, and how long I expect it to take, so we agree on the same thing before any code.",
+  },
+  {
+    title: "Build in reviewable pieces",
+    body: "I ship in small increments to a preview deployment you can click through, and send a short written update with each one. You see progress as it happens, not at the end.",
+  },
+  {
+    title: "Launch and handover",
+    body: "I deploy to production, check that it holds up, and hand over the repository, environments and notes on how it all fits together.",
+  },
+];
+
+const faqs = [
+  {
+    q: "What timezone do you work in?",
+    a: "Pakistan Standard Time (PKT, UTC+5), with no daylight saving. That's 4–5 hours ahead of the UK and 9–10 hours ahead of US Eastern time. Most of the work happens in writing, and we pick a regular time for calls that suits both of us.",
+  },
+  {
+    q: "How does working remotely with you look day to day?",
+    a: "Written updates by email or whatever chat you already use, a preview link for every piece of work, and code in a Git repository you can see from day one. Calls are for decisions, not status reports.",
+  },
+  {
+    q: "Which stacks do you work with?",
+    a: "Mostly TypeScript with Next.js and React, Node.js, Drizzle, and Postgres (Neon or Supabase) or Cloudflare D1, deployed on Vercel or Cloudflare Workers. For auth I've shipped Clerk with role-based access, and for AI features the Vercel AI SDK with Gemini.",
+  },
+  {
+    q: "Can you take over an existing codebase?",
+    a: "Yes. I start by getting it running locally, reading through it, and writing down what I find: what's fragile, what's fine, and what should be fixed first. Then I fix the thing you actually need fixed before suggesting anything bigger.",
+  },
+  {
+    q: "Do you also design the interface?",
+    a: "I'm an engineer first. I build from Figma files or from an existing site's style. If you need design as well, say so in your first message and we'll work out what makes sense.",
+  },
+  {
+    q: "How do I get started?",
+    a: "Send me a message with what you're building, where it stands, and when you need it. I read every message myself and reply by email.",
+  },
+];
+
+const structuredData = [
+  serviceSchema({
+    url: pageUrl,
+    name: "Freelance full-stack web development",
+    description:
+      "Next.js web apps, SaaS MVPs, e-commerce, AI and LLM features, APIs, databases and deployment, plus fixes and maintenance for existing Next.js apps.",
+    serviceTypes: [
+      "Full-stack web development",
+      "Next.js development",
+      "E-commerce development",
+      "AI integration",
+      "API and database development",
+    ],
+    areaServed: [AREA.worldwide, AREA.pakistan, AREA.gujranwala],
+  }),
+  breadcrumbSchema([
+    { name: "Home", url: new URL("/", SITE.website).href },
+    { name: "Hire", url: pageUrl },
+  ]),
+];
+---
+
+<Layout
+  title="Hire a Freelance Next.js & Full-Stack Developer | Jameel Ahmad"
+  description={description}
+  structuredData={structuredData}
+>
+  <Header />
+  <main id="main-content" class="app-layout pb-24">
+    <!-- Intro -->
+    <section
+      aria-labelledby="hire-title"
+      class="grid gap-x-12 gap-y-12 pt-12 pb-16 sm:pt-16 lg:grid-cols-[minmax(0,1fr)_20rem] lg:pt-20 lg:pb-20"
+    >
+      <div class="min-w-0">
+        <p class="type-meta text-ink-soft">Hire · Freelance · Remote</p>
+        <h1
+          id="hire-title"
+          class="type-display mt-6 max-w-[16ch] text-[clamp(2.1rem,5.6vw,4rem)]"
+        >
+          Hire a freelance full-stack developer
+        </h1>
+        <div class="mt-8 max-w-[62ch] space-y-4 text-lg leading-relaxed text-ink-soft">
+          <p>
+            I'm <a href="/about/" class="link-ink text-ink">Jameel Ahmad</a>, a full-stack
+            software engineer in Pakistan. I build web apps with Next.js and TypeScript
+            and take them from an empty repository to production: architecture, backend,
+            database and deployment.
+          </p>
+          <p>
+            That's my day-to-day as a freelance developer at
+            <a href="https://www.innovorus.com/" {...ext} class="link-ink text-ink">Innovorus</a>,
+            and it's what I can do for you, whether you need an MVP, an online store, an AI
+            feature in an existing product, or someone to fix the app you already have.
+          </p>
+        </div>
+        <div class="mt-10 flex flex-wrap items-center gap-3">
+          <a href="/contact/" class="btn btn-primary">
+            <IconMail class="size-4" aria-hidden="true" />
+            Tell me about your project
+          </a>
+          <a href={`mailto:${email}`} class="btn btn-ghost">{email}</a>
+        </div>
+      </div>
+
+      <aside
+        aria-label="At a glance"
+        class="self-start rounded-2xl border border-line bg-surface p-6 lg:mt-2"
+      >
+        <dl class="grid gap-5">
+          <div>
+            <dt class="type-meta text-ink-soft">Based in</dt>
+            <dd class="mt-1">
+              <a href="/software-engineer-gujranwala/" class="link-ink">Gujranwala</a>, Punjab, Pakistan
+            </dd>
+          </div>
+          <div>
+            <dt class="type-meta text-ink-soft">Works with</dt>
+            <dd class="mt-1">Clients anywhere, remotely</dd>
+          </div>
+          <div>
+            <dt class="type-meta text-ink-soft">Hours</dt>
+            <dd class="mt-1">PKT (UTC+5)</dd>
+          </div>
+          <div>
+            <dt class="type-meta text-ink-soft">Focus</dt>
+            <dd class="mt-1">Next.js, TypeScript, Postgres, AI features</dd>
+          </div>
+        </dl>
+      </aside>
+    </section>
+
+    <!-- Services -->
+    <AboutSection id="services" label="What I build" note={`${services.length} kinds of work`}>
+      <div class="divide-y divide-line">
+        {
+          services.map(s => (
+            <article class="grid gap-3 py-8 first:pt-0 last:pb-0">
+              <h3 class="type-heading text-xl sm:text-2xl">{s.title}</h3>
+              <p class="max-w-[68ch] text-ink-soft">{s.body}</p>
+              <p class="proof max-w-[68ch] text-[0.95rem]">
+                <span class="type-meta me-2 text-ink-soft">Proof</span>
+                {s.proof.text}{" "}
+                <a
+                  href={s.proof.href}
+                  class="link-ink font-medium whitespace-nowrap"
+                  {...(s.proof.href.startsWith("http") ? ext : {})}
+                >
+                  {s.proof.label}
+                  {s.proof.href.startsWith("http") && <span aria-hidden="true" class="text-xs"> ↗</span>}
+                </a>
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </AboutSection>
+
+    <!-- Stack -->
+    <AboutSection id="stack" label="Tech stack">
+      <dl class="divide-y divide-line">
+        {
+          stack.map(s => (
+            <div class="grid gap-x-8 gap-y-2.5 py-4 first:pt-0 last:pb-0 sm:grid-cols-[12rem_minmax(0,1fr)]">
+              <dt class="type-meta pt-1 text-ink-soft">{s.area}</dt>
+              <dd class="flex flex-wrap gap-1.5">
+                {s.items.map(item => (
+                  <span class="chip text-ink">{item}</span>
+                ))}
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+      <p class="mt-6 max-w-[64ch] text-ink-soft">
+        The full list, with the projects each tool was used on, is on my
+        <a href="/about/#skills" class="link-ink text-ink">about page</a>.
+      </p>
+    </AboutSection>
+
+    <!-- Process -->
+    <AboutSection id="process" label="How a project works" note={`${steps.length} steps`}>
+      <ol class="max-w-[62ch]">
+        {
+          steps.map((step, i) => (
+            <li class="step relative ps-10 pb-8 last:pb-0">
+              <span class="step-node type-meta" aria-hidden="true">{i + 1}</span>
+              <h3 class="type-heading text-lg">{step.title}</h3>
+              <p class="mt-2 text-ink-soft">{step.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </AboutSection>
+
+    <!-- Where -->
+    <AboutSection id="where" label="Remote and in Gujranwala">
+      <div class="max-w-[62ch] space-y-4 text-ink-soft">
+        <p>
+          I work with clients worldwide, remotely. A project doesn't need us in the same
+          room: the work lives in the repository, the preview links and the written
+          updates. I work from Pakistan on PKT, and we find a regular slot in your day
+          for the calls that matter.
+        </p>
+        <p>
+          If you're in Gujranwala or close by, we can also sit down together. I wrote a
+          separate page on
+          <a href="/software-engineer-gujranwala/" class="link-ink text-ink">working with local businesses in Gujranwala</a>:
+          websites, online stores and live status pages, in Urdu, Punjabi or English.
+        </p>
+      </div>
+    </AboutSection>
+
+    <!-- FAQ -->
+    <AboutSection id="faq" label="Questions">
+      <div class="divide-y divide-line">
+        {
+          faqs.map(f => (
+            <div class="py-6 first:pt-0 last:pb-0">
+              <h3 class="type-heading text-lg">{f.q}</h3>
+              <p class="mt-2 max-w-[64ch] text-ink-soft">{f.a}</p>
+            </div>
+          ))
+        }
+      </div>
+    </AboutSection>
+
+    <!-- Closing -->
+    <section
+      aria-label="Start a project"
+      class="grid gap-x-12 gap-y-8 border-t border-line pt-12 lg:grid-cols-[13rem_minmax(0,1fr)] lg:pt-16"
+    >
+      <div class="hidden lg:block" aria-hidden="true"></div>
+      <div>
+        <p class="type-heading max-w-[40ch] text-[clamp(1.15rem,2vw,1.45rem)] leading-snug font-medium">
+          Tell me what you're building, where it stands, and when you need it. I'll reply
+          by email.
+        </p>
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+          <a href="/contact/" class="btn btn-primary">
+            <IconMail class="size-4" aria-hidden="true" />
+            Send me a message
+          </a>
+          <a href={`mailto:${email}`} class="btn btn-ghost">Email {email}</a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  /* Process steps sit on a rail, same language as the commit graph */
+  .step::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0.75rem;
+    top: 1.75rem;
+    bottom: 0.25rem;
+    width: 2px;
+    translate: -50% 0;
+    background: var(--line);
+  }
+  .step:last-child::before {
+    display: none;
+  }
+  .step-node {
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0;
+    display: grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 999px;
+    border: 2px solid var(--ink);
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 0.7rem;
+  }
+  .step:first-child .step-node {
+    background: var(--marigold);
+    border-color: var(--marigold);
+  }
+  .proof {
+    padding-inline-start: 0.9rem;
+    border-inline-start: 2px solid var(--marigold);
+  }
+</style>

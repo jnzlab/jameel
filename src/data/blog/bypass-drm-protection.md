@@ -1,7 +1,8 @@
 ---
-title: Record any Privacy Protected Screen like Snapchat, Netflix and other Social & OTT Platforms
+title: "Record Protected Screens on Fedora with GNOME Boxes and OBS"
 author: Jameel Ahmad
 pubDatetime: 2026-04-22T02:22:00+05:00
+modDatetime: 2026-09-23T00:00:00Z
 slug: record-privacy-protected-screen-fedora-boxes-obs
 featured: true
 draft: false
@@ -15,7 +16,7 @@ tags:
   - snapchat
   - netflix
   - obs-studio
-description: A friendly step-by-step tutorial showing exactly how I record Snapchat private videos, Netflix, Disney+, and any other “protected” screen content without triggering notifications — using just GNOME Boxes on Fedora and OBS on the host. I’ll also explain why this simple trick works so well.
+description: "How a GNOME Boxes VM on Fedora plus OBS on the host records screen-protected apps like Snapchat and Netflix, and why in-app recording blocks miss it."
 ogImage: ../../assets/images/drm-protection-disaster.png
 ---
 
@@ -73,7 +74,7 @@ flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flat
 flatpak install flathub org.snapchat.Snapchat
 ```
 
-For Netflix or any other platform, just open Firefox inside the VM and go to the website.
+For Netflix or any other platform, just open Firefox inside the VM and go to the website. (If videos play as a black or blank screen on a fresh Fedora install, you are probably [missing the H.264 codec](/posts/fixing-h264-codec-fedora/).)
 
 Log in and open the private/protected video or content you want to capture.
 

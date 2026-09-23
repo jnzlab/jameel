@@ -28,7 +28,7 @@ const onContactPage = Astro.url.pathname.replace(/\/$/, "") === "/contact";
           <>
             {/* The address is the headline, but it opens the on-site form so visitors stay here */}
             <a
-              href={onContactPage ? "#contact-form" : "/contact"}
+              href={onContactPage ? "#contact-form" : "/contact/"}
               aria-label={`Send me a message (${email})`}
               class="type-heading mt-3 inline-block text-[clamp(1.4rem,4.2vw,2.75rem)] break-all underline decoration-marigold decoration-[3px] underline-offset-[0.18em] transition-colors hover:text-cobalt"
             >
@@ -46,6 +46,11 @@ const onContactPage = Astro.url.pathname.replace(/\/$/, "") === "/contact";
       <p class="mt-4 max-w-md text-ink-soft">
         Open to freelance projects and full-time roles building full-stack and
         AI-powered products.
+      </p>
+      <p class="type-meta mt-3 text-ink-soft">
+        <a href="/hire/" class="link-ink">Hire me</a>
+        <span aria-hidden="true"> · </span>
+        <a href="/software-engineer-gujranwala/" class="link-ink">Software engineer in Gujranwala</a>
       </p>
     </div>
 

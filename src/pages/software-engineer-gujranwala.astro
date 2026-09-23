@@ -1,0 +1,277 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import AboutSection from "@/components/about/AboutSection.astro";
+import IconMail from "@/assets/icons/IconMail.svg";
+import { SITE } from "@/config";
+import { AREA, breadcrumbSchema, serviceSchema } from "@/utils/seo";
+
+const email = "jameel@jnzlab.io";
+const phone = { label: "+92 349 7660082", tel: "tel:+923497660082", whatsapp: "https://wa.me/923497660082" };
+const pageUrl = new URL("/software-engineer-gujranwala/", SITE.website).href;
+const description =
+  "Software engineer in Gujranwala building websites, online stores and web apps for local businesses. Meet in person; Urdu, Punjabi or English. Get in touch.";
+
+const ext = { target: "_blank", rel: "noopener noreferrer" };
+
+/* What businesses around here usually ask for, each tied to real work. */
+const needs = [
+  {
+    title: "A fast website that works on phones",
+    body: "Most of your customers will open your site on a phone, often on mobile data. I build sites that load quickly, show your hours, location and contact details up front, and let people call or message you in one tap.",
+  },
+  {
+    title: "An online store",
+    body: "A catalog, a cart, and an order flow that matches how you actually get paid, including cash on delivery, plus an admin panel where you or your staff can add products and see new orders without calling me.",
+    example: {
+      name: "Pouch Parlour",
+      href: "https://pouchparlour.com",
+      text: "a storefront for phone covers and keychains with guest checkout, so customers can order without creating an account, and an admin dashboard with low-stock alerts.",
+    },
+  },
+  {
+    title: "Live status and booking pages",
+    body: "Sometimes the most useful thing is small: a page that tells customers whether you're open right now, or lets them reserve a slot, so they don't have to call first.",
+    example: {
+      name: "Hafiz Chaska Point",
+      href: "https://hafizchaskapoint.vercel.app",
+      text: "a live-status site I built for a local shop. Customers check in real time whether it's open and can turn on notifications for when it opens; the owner flips the status from a PIN-protected admin page.",
+    },
+  },
+];
+
+const posts = [
+  {
+    title: "Your \"Server Component\" is running on the client",
+    href: "/posts/server-component-runs-on-client/",
+  },
+  {
+    title: "Full-stack Next.js with isolated Supabase environments using Podman",
+    href: "/posts/nextjs-supabase-podman-dual-environments/",
+  },
+  {
+    title: "Fixing TestSprite tests blocked by Clerk auth in Next.js",
+    href: "/posts/testsprite-nextjs-clerk-auth/",
+  },
+];
+
+const structuredData = [
+  serviceSchema({
+    url: pageUrl,
+    name: "Software and web development in Gujranwala",
+    description:
+      "Websites, online stores, live status and booking pages, and Next.js web apps for businesses, startups and agencies in Gujranwala, with in-person meetings available.",
+    serviceTypes: [
+      "Website development",
+      "E-commerce development",
+      "Web application development",
+      "Next.js development",
+    ],
+    areaServed: [AREA.gujranwala],
+  }),
+  breadcrumbSchema([
+    { name: "Home", url: new URL("/", SITE.website).href },
+    { name: "Software engineer in Gujranwala", url: pageUrl },
+  ]),
+];
+---
+
+<Layout
+  title="Web & Software Developer in Gujranwala | Jameel Ahmad"
+  description={description}
+  structuredData={structuredData}
+>
+  <Header />
+  <main id="main-content" class="app-layout pb-24">
+    <!-- Intro -->
+    <section
+      aria-labelledby="local-title"
+      class="grid gap-x-12 gap-y-12 pt-12 pb-16 sm:pt-16 lg:grid-cols-[minmax(0,1fr)_20rem] lg:pt-20 lg:pb-20"
+    >
+      <div class="min-w-0">
+        <p class="type-meta text-ink-soft">Gujranwala, Punjab · In person or remote</p>
+        <h1
+          id="local-title"
+          class="type-display mt-6 max-w-[16ch] text-[clamp(2.1rem,5.6vw,4rem)]"
+        >
+          A software engineer in Gujranwala
+        </h1>
+        <div class="mt-8 max-w-[62ch] space-y-4 text-lg leading-relaxed text-ink-soft">
+          <p>
+            I'm <a href="/about/" class="link-ink text-ink">Jameel Ahmad</a>. I live in
+            Gujranwala, studied Computer Science at GIFT University here (2021–2025), and
+            build websites and web apps for a living.
+          </p>
+          <p>
+            I work remotely with clients worldwide. But if you run a shop, a clinic, a
+            factory or a small startup in the city and want something built properly, you
+            don't have to hire someone you'll never meet. We can sit down together, talk it
+            through in Urdu, Punjabi or English, and I'll explain what I'd build and why,
+            without the jargon.
+          </p>
+        </div>
+        <div class="mt-10 flex flex-wrap items-center gap-3">
+          <a href="/contact/" class="btn btn-primary">
+            <IconMail class="size-4" aria-hidden="true" />
+            Send me a message
+          </a>
+          <a href={phone.whatsapp} {...ext} class="btn btn-ghost">WhatsApp {phone.label}</a>
+        </div>
+      </div>
+
+      <aside
+        aria-label="At a glance"
+        class="self-start rounded-2xl border border-line bg-surface p-6 lg:mt-2"
+      >
+        <dl class="grid gap-5">
+          <div>
+            <dt class="type-meta text-ink-soft">Based in</dt>
+            <dd class="mt-1">Gujranwala, Punjab</dd>
+          </div>
+          <div>
+            <dt class="type-meta text-ink-soft">Meetings</dt>
+            <dd class="mt-1">In person in Gujranwala, or a call</dd>
+          </div>
+          <div>
+            <dt class="type-meta text-ink-soft">Languages</dt>
+            <dd class="mt-1">Urdu, Punjabi, English</dd>
+          </div>
+          <div>
+            <dt class="type-meta text-ink-soft">Hours</dt>
+            <dd class="mt-1">Pakistan time (PKT)</dd>
+          </div>
+        </dl>
+        <dl class="mt-6 grid gap-2.5 border-t border-line pt-5 text-[0.95rem]">
+          <div class="grid grid-cols-[4.75rem_minmax(0,1fr)] items-baseline gap-3">
+            <dt class="type-meta text-ink-soft">Phone</dt>
+            <dd class="min-w-0 truncate"><a href={phone.tel} class="link-ink">{phone.label}</a></dd>
+          </div>
+          <div class="grid grid-cols-[4.75rem_minmax(0,1fr)] items-baseline gap-3">
+            <dt class="type-meta text-ink-soft">Email</dt>
+            <dd class="min-w-0 truncate"><a href={`mailto:${email}`} class="link-ink">{email}</a></dd>
+          </div>
+        </dl>
+      </aside>
+    </section>
+
+    <!-- Local needs -->
+    <AboutSection id="local-needs" label="What local businesses need">
+      <div class="divide-y divide-line">
+        {
+          needs.map(n => (
+            <article class="grid gap-3 py-8 first:pt-0 last:pb-0">
+              <h3 class="type-heading text-xl sm:text-2xl">{n.title}</h3>
+              <p class="max-w-[68ch] text-ink-soft">{n.body}</p>
+              {n.example && (
+                <p class="example max-w-[68ch] text-[0.95rem]">
+                  <span class="type-meta me-2 text-ink-soft">Built</span>
+                  <a href={n.example.href} {...ext} class="link-ink font-medium">
+                    {n.example.name}
+                    <span aria-hidden="true" class="text-xs"> ↗</span>
+                  </a>, {n.example.text}
+                </p>
+              )}
+            </article>
+          ))
+        }
+      </div>
+    </AboutSection>
+
+    <!-- Working together -->
+    <AboutSection id="working-together" label="Working together">
+      <div class="max-w-[62ch] space-y-4 text-ink-soft">
+        <p>
+          We start with a conversation, in person if you're in Gujranwala. You show me how
+          your business runs today; I tell you what's worth putting online and what isn't.
+          Then I write down what I'll build and how long it should take, before any work
+          starts.
+        </p>
+        <p>
+          While I build, you get a link to see the site as it takes shape, and I keep you
+          updated in plain language on WhatsApp or email. When it's live, I show you or
+          your staff how to update it yourselves, so you're not stuck waiting on me for
+          every price change.
+        </p>
+        <p>
+          If you're in a nearby city like Lahore, Sialkot or Gujrat, the same applies; we
+          can meet or do it over a call.
+        </p>
+      </div>
+    </AboutSection>
+
+    <!-- Startups and agencies -->
+    <AboutSection id="startups" label="Startups and agencies">
+      <div class="max-w-[62ch] space-y-4 text-ink-soft">
+        <p>
+          If you're a startup or an agency in Gujranwala and need a Next.js engineer for a
+          project, I can own the engineering side: architecture, backend, database and
+          deployment. That's what I already do as a freelance developer at
+          <a href="https://www.innovorus.com/" {...ext} class="link-ink text-ink">Innovorus</a>,
+          a small studio where I work alongside a designer partner.
+        </p>
+        <p>
+          One example is
+          <a href="https://lucidhire.io" {...ext} class="link-ink text-ink">LucidHire</a>, a
+          multi-tenant hiring platform with AI candidate screening, built on Next.js,
+          Postgres with pgvector, and Gemini. The full list of services, the stack and how
+          a project runs are on the
+          <a href="/hire/" class="link-ink text-ink">hire page</a>.
+        </p>
+      </div>
+    </AboutSection>
+
+    <!-- Writing -->
+    <AboutSection id="writing" label="How I work, in writing">
+      <p class="max-w-[62ch] text-ink-soft">
+        If you want to see how I think before we talk, I write up the problems I solve.
+        A few on building web apps:
+      </p>
+      <ul class="mt-5 grid max-w-[62ch] gap-3">
+        {
+          posts.map(p => (
+            <li>
+              <a href={p.href} class="group inline-flex items-baseline gap-2 font-medium text-ink hover:text-cobalt">
+                <span aria-hidden="true" class="text-cobalt transition-transform group-hover:translate-x-0.5">→</span>
+                <span class="link-ink">{p.title}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="mt-6 max-w-[62ch] text-ink-soft">
+        More background, projects and open-source work on my
+        <a href="/about/" class="link-ink text-ink">about page</a>.
+      </p>
+    </AboutSection>
+
+    <!-- Closing -->
+    <section
+      aria-label="Get in touch"
+      class="grid gap-x-12 gap-y-8 border-t border-line pt-12 lg:grid-cols-[13rem_minmax(0,1fr)] lg:pt-16"
+    >
+      <div class="hidden lg:block" aria-hidden="true"></div>
+      <div>
+        <p class="type-heading max-w-[40ch] text-[clamp(1.15rem,2vw,1.45rem)] leading-snug font-medium">
+          Looking for a software engineer in Gujranwala? Tell me what your business needs,
+          and we can meet or talk it over on a call.
+        </p>
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+          <a href="/contact/" class="btn btn-primary">
+            <IconMail class="size-4" aria-hidden="true" />
+            Send me a message
+          </a>
+          <a href={phone.whatsapp} {...ext} class="btn btn-ghost">Message on WhatsApp</a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  .example {
+    padding-inline-start: 0.9rem;
+    border-inline-start: 2px solid var(--marigold);
+  }
+</style>

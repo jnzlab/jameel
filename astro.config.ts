@@ -13,6 +13,7 @@ import {
 } from "@shikijs/transformers";
 import { transformerFileName } from "./src/utils/transformers/fileName";
 import { SITE } from "./src/config";
+import { readdirSync, readFileSync } from "node:fs";
 
 // https://astro.build/config
 const siteUrl = new URL(SITE.website);
@@ -33,17 +34,61 @@ const externalLinksOptions: ExternalLinksOptions = {
   },
 };
 
+// Sitemap <lastmod> for posts comes from frontmatter (modDatetime ?? pubDatetime),
+// not build time: Google only trusts lastmod when it tracks real content changes.
+const BLOG_DIR = "./src/data/blog";
+const postLastmod = new Map<string, string>();
+for (const file of readdirSync(BLOG_DIR)) {
+  if (!file.endsWith(".md") || file.startsWith("_")) continue;
+  const frontmatter = readFileSync(`${BLOG_DIR}/${file}`, "utf8").split("---")[1] ?? "";
+  if (/^draft:\s*true/m.test(frontmatter)) continue;
+  const date =
+    frontmatter.match(/^modDatetime:\s*(\S+)/m)?.[1] ??
+    frontmatter.match(/^pubDatetime:\s*(\S+)/m)?.[1];
+  if (date && date !== "null") {
+    // URLs use the frontmatter slug when present, else the file name.
+    const slug = frontmatter.match(/^slug:\s*["']?([^"'\s]+)/m)?.[1] ?? file.replace(/\.md$/, "");
+    postLastmod.set(slug, new Date(date).toISOString());
+  }
+}
+const latestPost = [...postLastmod.values()].sort().at(-1);
+
+// Pages that exist for navigation but add no unique content to search results.
+// They are also marked noindex in their templates.
+const excludeFromSitemap = (url: string) => {
+  const path = new URL(url).pathname;
+  return (
+    path === "/search/" ||
+    path.startsWith("/tags/") ||
+    /^\/posts\/\d+\/$/.test(path) ||
+    (!SITE.showArchives && path === "/archives/")
+  );
+};
+
 export default defineConfig({
   site: SITE.website,
   // Pages stay prerendered; the adapter only serves on-demand routes such as
   // Astro Actions (contact form, post feedback).
   adapter: vercel(),
+  // One URL per page: /about/ is canonical and /about redirects to it.
+  trailingSlash: "always",
   // Astro 7 defaults to JSX-style whitespace stripping ("jsx"), which glues
   // adjacent inline elements together in our templates. Keep HTML semantics.
   compressHTML: true,
   integrations: [
     sitemap({
-      filter: page => SITE.showArchives || !page.endsWith("/archives"),
+      filter: page => !excludeFromSitemap(page),
+      serialize: item => {
+        const path = new URL(item.url).pathname;
+        const slug = path.match(/^\/posts\/(.+)\/$/)?.[1];
+        const lastmod = slug ? postLastmod.get(slug) : undefined;
+        if (lastmod) return { ...item, lastmod };
+        // Listing pages change whenever a post is added.
+        if ((path === "/" || path === "/posts/" || path === "/archives/") && latestPost) {
+          return { ...item, lastmod: latestPost };
+        }
+        return item;
+      },
     }),
   ],
   markdown: {

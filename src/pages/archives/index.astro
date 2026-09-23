@@ -24,7 +24,10 @@ const years = [...posts.map(p => p.data.pubDatetime), ...milestones.map(m => m.d
 const span = `${Math.min(...years)}–${Math.max(...years)}`;
 ---
 
-<Layout title={`Archive | ${SITE.title}`}>
+<Layout
+  title={`Archive | ${SITE.title}`}
+  description="Every post and career milestone from Jameel Ahmad in one history, newest first."
+>
   <Header />
   <Main
     pageTitle="Archive"

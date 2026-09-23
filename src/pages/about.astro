@@ -7,6 +7,7 @@ import IconDownload from "@/assets/icons/IconDownload.svg";
 import IconMail from "@/assets/icons/IconMail.svg";
 import { projects } from "@/data/projects";
 import { SITE } from "@/config";
+import { profilePageSchema } from "@/utils/seo";
 
 const email = "jameel@jnzlab.io";
 
@@ -92,8 +93,10 @@ const ext = { target: "_blank", rel: "noopener noreferrer" };
 ---
 
 <Layout
-  title={`About | ${SITE.title}`}
-  description="Jameel Ahmad is a full-stack developer (Next.js, TypeScript) in Gujranwala, Pakistan, freelancing at Innovorus. Experience, projects, skills, open-source work, and contact details."
+  title={`About Jameel Ahmad | Software Engineer, Gujranwala`}
+  description="Jameel Ahmad, full-stack software engineer (Next.js, TypeScript) in Gujranwala, Pakistan: experience, projects, skills, open source and contact."
+  ogType="profile"
+  structuredData={[profilePageSchema(new URL("/about/", SITE.website).href)]}
 >
   <Header />
   <main id="main-content" class="app-layout pb-24">
@@ -135,7 +138,7 @@ const ext = { target: "_blank", rel: "noopener noreferrer" };
             <IconDownload class="size-4" aria-hidden="true" />
             Download resume
           </a>
-          <a href="/contact" class="btn btn-ghost">
+          <a href="/contact/" class="btn btn-ghost">
             <IconMail class="size-4" aria-hidden="true" />
             Get in touch
           </a>
@@ -330,8 +333,12 @@ const ext = { target: "_blank", rel: "noopener noreferrer" };
           Open to opportunities where I can ship impactful full-stack products and keep
           growing — especially in AI-augmented workflows and developer tooling.
         </p>
+        <p class="mt-4 max-w-[52ch] text-ink-soft">
+          Hiring for a freelance project?
+          <a href="/hire/" class="link-ink text-ink">See what I build and how a project runs</a>.
+        </p>
         <div class="mt-8 flex flex-wrap items-center gap-3">
-          <a href="/contact" class="btn btn-primary">
+          <a href="/contact/" class="btn btn-primary">
             <IconMail class="size-4" aria-hidden="true" />
             Send me a message
           </a>

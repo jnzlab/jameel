@@ -1,7 +1,8 @@
 ---
-title: How I Fixed Testsprite Tests Getting Blocked by Clerk Auth in Next.js
+title: "TestSprite Tests Blocked by Clerk Auth in Next.js: The Fix"
 author: Jameel Ahmad
 pubDatetime: 2026-04-18T01:43:00+05:00
+modDatetime: 2026-09-23T00:00:00Z
 slug: testsprite-nextjs-clerk-auth
 featured: true
 draft: false
@@ -12,7 +13,7 @@ tags:
   - typescript
   - backend
   - frontend
-description: How I fixed both backend and frontend Testsprite tests getting blocked by Clerk auth — using the Clerk Backend SDK for API tests and Clerk's special test credentials for E2E UI tests.
+description: "TestSprite tests blocked by Clerk with 401 Unauthorized? Use a Backend SDK JWT for API tests and a +clerk_test email with 424242 for E2E sign-in."
 ogImage: ../../assets/images/testsprite-before.png
 ---
 
@@ -300,3 +301,7 @@ After setting this up across LucidHire's test suite, every test that was previou
 ![Testsprite test results after the fix — nearly all test cases now showing Pass status](../../assets/images/testsprite-after.png)
 
 That is exactly what a good test suite should do.
+
+On the same app, TestSprite also caught a real bug for me: [a silent HTTP 500 in our Polar checkout route](/posts/testsprite-polar-checkout-bug/).
+
+If you need help getting auth and testing right in a Next.js app like this, [I take on freelance work](/hire/).

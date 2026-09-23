@@ -9,7 +9,11 @@ import { SITE } from "@/config";
 const backUrl = SITE.showBackButton ? `${Astro.url.pathname}` : "/";
 ---
 
-<Layout title={`Search | ${SITE.title}`}>
+<Layout
+  title={`Search | ${SITE.title}`}
+  description="Search every post by title, error message, or tool name."
+  noindex
+>
   <Header />
   <Main
     pageTitle="Search"

@@ -19,12 +19,13 @@ const isActive = (path: string) => {
 };
 
 const navItems = [
-  { href: "/posts", label: "Writing", match: "/posts" },
+  { href: "/posts/", label: "Writing", match: "/posts" },
   ...(SITE.showArchives
-    ? [{ href: "/archives", label: "Archive", match: "/archives" }]
+    ? [{ href: "/archives/", label: "Archive", match: "/archives" }]
     : []),
-  { href: "/about", label: "About", match: "/about" },
-  { href: "/contact", label: "Contact", match: "/contact" },
+  { href: "/hire/", label: "Hire", match: "/hire" },
+  { href: "/about/", label: "About", match: "/about" },
+  { href: "/contact/", label: "Contact", match: "/contact" },
 ];
 ---
 
@@ -87,7 +88,7 @@ const navItems = [
       </ul>
 
       <a
-        href="/search"
+        href="/search/"
         class="ms-1 flex size-9 items-center justify-center gap-2 rounded-full border border-line text-ink-soft transition-colors hover:border-ink hover:text-ink md:h-auto md:w-auto md:py-1.5 md:ps-3 md:pe-2"
         aria-label="Search posts"
         title="Search (⌘K)"

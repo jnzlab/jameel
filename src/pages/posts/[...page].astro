@@ -35,7 +35,13 @@ const topTags = tags.filter(tag => tag.count > 1);
 const hiddenTags = tags.length - topTags.length;
 ---
 
-<Layout title={`Writing | ${SITE.title}`}>
+<Layout
+  title={page.currentPage > 1
+    ? `Writing, page ${page.currentPage} | ${SITE.title}`
+    : `Writing: Next.js, TypeScript & Fedora Guides | ${SITE.title}`}
+  description="Fixes, guides and lessons from shipping Next.js apps and running Fedora Linux, by full-stack engineer Jameel Ahmad."
+  noindex={page.currentPage > 1}
+>
   <Header />
   <Main
     pageTitle="Writing"

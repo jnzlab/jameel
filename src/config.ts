@@ -1,8 +1,8 @@
 export const SITE = {
   website: "https://jnzlab.io/",
   author: "Jameel Ahmad",
-  profile: "https://jnzlab.io/",
-  desc: "Full-stack developer (Next.js, TypeScript). Freelance at Innovorus; AI candidate screening, e-commerce, CLI tools, and open source—portfolio and blog by Jameel Ahmad.",
+  profile: "https://jnzlab.io/about/",
+  desc: "Jameel Ahmad is a freelance full-stack software engineer in Gujranwala, Pakistan, building Next.js, TypeScript and AI web apps for clients worldwide.",
   resumeUrl: "https://assets.jnzlab.io/resume.pdf",
   title: "Jameel Ahmad",
   ogImage: "", // empty = use the generated /og.png

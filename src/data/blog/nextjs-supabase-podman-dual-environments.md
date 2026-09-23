@@ -1,7 +1,8 @@
 ---
-title: Full-Stack Next.js with Isolated Supabase Environments Using Podman
+title: "Supabase Local Development with Podman on Fedora (Next.js)"
 author: Jameel Ahmad
 pubDatetime: 2026-09-04T14:05:00+05:00
+modDatetime: 2026-09-23T00:00:00Z
 slug: nextjs-supabase-podman-dual-environments
 featured: true
 draft: false
@@ -11,7 +12,7 @@ tags:
   - podman
   - linux
   - postgresql
-description: A complete guide to setting up identical local and remote Supabase environments in Next.js using rootless Podman, automated migrations, and zero-risk DB workflows for AI agents.
+description: "Supabase local development on Fedora with rootless Podman, mirrored to Supabase Cloud from Next.js with separate env files, migrations and seed data."
 ogImage: ../../assets/images/nextjs-supabase-podman-dual-environments.png
 ---
 
@@ -251,6 +252,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 Whenever you run `pnpm dev`, Next.js injects the local Podman configuration from `.env.development`. When deployed on Vercel or running a production build (`pnpm build && pnpm start`), it transparently connects to your hosted database using `.env.production`.
 
+Only the anon key belongs in `NEXT_PUBLIC_` variables. Anything prefixed that way ships to the browser, and it is easier than you think for "server" code to end up there too; I wrote about that in [why your Next.js Server Component runs on the client](/posts/server-component-runs-on-client/).
+
 ## Testing the Full Workflow
 
 1. Apply your migrations and seed the local Podman database:
@@ -268,3 +271,5 @@ Whenever you run `pnpm dev`, Next.js injects the local Podman configuration from
    ```
 
 Now you have a development workflow with zero cloud dependencies, full offline capability, complete isolation from production, and an environment safe for AI coding agents to run wild.
+
+If you need help setting up a Next.js and Supabase app like this, [I take on freelance work](/hire/).

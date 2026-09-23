@@ -1,7 +1,8 @@
 ---
-title: Overcoming YouTube Authentication Hurdles with yt-dlp
+title: "yt-dlp \"Sign in to confirm you're not a bot\": Cookies Fix"
 author: Jameel Ahmad
 pubDatetime: 2026-01-30T03:02:00+05:00
+modDatetime: 2026-09-23T00:00:00Z
 slug: ytdlp-cookie-auth-guide
 featured: false
 draft: false
@@ -10,7 +11,7 @@ tags:
   - yt-dlp
   - troubleshooting
   - multimedia
-description: Solving the "Could not copy Chrome cookie database" error in yt-dlp using manual cookie extraction.
+description: "Fix yt-dlp \"Sign in to confirm you're not a bot\" and \"Could not copy Chrome cookie database\" by exporting cookies.txt instead of --cookies-from-browser."
 ogImage: ../../assets/images/ytdlp-cookie-auth-guide.png
 ---
 
@@ -18,7 +19,7 @@ For anyone who loves managing their own media library, **yt-dlp** is the gold st
 
 ![The Get cookies.txt LOCALLY extension in the Chrome Web Store](../../assets/images/ytdlp-cookie-auth-guide.png)
 
-However, as platforms like YouTube tighten their security to prevent botting, we often run into "Sign in to confirm you’re not a bot" errors or age-restriction blocks. While yt-dlp has a built-in feature to grab cookies directly from your browser, modern security updates have made this process surprisingly frustrating.
+However, as platforms like YouTube tighten their security to prevent botting, we often run into "Sign in to confirm you’re not a bot" errors or age-restriction blocks. While yt-dlp has a built-in feature to grab cookies directly from your browser, modern security updates have made this process surprisingly frustrating: `--cookies-from-browser` often fails with `ERROR: Could not copy Chrome cookie database`.
 
 ## Table of contents
 
@@ -68,3 +69,5 @@ yt-dlp --js-runtimes node --remote-components ejs:github --cookies cookies.txt -
 ## A Note on Security
 
 Your `cookies.txt` file is essentially a temporary key to your account. Never share this file with anyone else! Once you are done with your downloads, it is a good habit to delete the text file or move it to a secure location.
+
+If you download videos on Fedora and they play as a blank screen, that is a different problem: [Fedora ships without the H.264 codec](/posts/fixing-h264-codec-fedora/).

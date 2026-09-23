@@ -35,7 +35,11 @@ const { tag } = params;
 const { page, tagName } = Astro.props;
 ---
 
-<Layout title={`Tagged ${tagName} | ${SITE.title}`}>
+<Layout
+  title={`Tagged ${tagName}${page.currentPage > 1 ? `, page ${page.currentPage}` : ""} | ${SITE.title}`}
+  description={`Posts by Jameel Ahmad about ${tagName}, newest first.`}
+  noindex
+>
   <Header />
   <Main
     pageTitle={["Tagged", `${tagName}`]}

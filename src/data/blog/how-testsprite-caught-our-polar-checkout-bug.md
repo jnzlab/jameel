@@ -1,7 +1,8 @@
 ---
-title: How TestSprite Helped Me Find a Silent Polar Checkout Bug (and How I Fixed It)
+title: "TestSprite Caught a Silent Polar Checkout 500 in Next.js"
 author: Jameel Ahmad
 pubDatetime: 2026-04-12T14:00:00+05:00
+modDatetime: 2026-09-23T00:00:00Z
 slug: testsprite-polar-checkout-bug
 featured: false
 draft: false
@@ -11,15 +12,15 @@ tags:
   - nextjs
   - polar
   - debugging
-description: TestSprite surfaced an HTTP 500 on our billing checkout route. Here is how AI-driven E2E testing led us to the real culprit—invalid URL handling in the Polar Next.js helper—and the fix we shipped.
+description: "TestSprite caught an HTTP 500 on our Polar checkout route in Next.js. The cause: new URL() throwing on a relative POLAR_SUCCESS_URL. Here is the fix."
 ogImage: ../../assets/images/testsprite-polar-checkout-bug.jpg
 ---
 
-I have been building **Lucid Hire**, a Next.js recruiter dashboard with **Clerk** auth, **Neon** Postgres, and **Polar** for subscriptions. The billing page lets recruiters click **Upgrade to Pro** and navigate to Polar-hosted checkout. In manual testing I had tunneling and env quirks, so I leaned on **TestSprite**—an MCP-connected E2E runner—to exercise the full app through a real browser session.
+I have been building **Lucid Hire**, a Next.js recruiter dashboard with **Clerk** auth, **Neon** Postgres, and **Polar** for subscriptions. The billing page lets recruiters click **Upgrade to Pro** and navigate to Polar-hosted checkout. In manual testing I had tunneling and env quirks, so I leaned on **TestSprite**—an MCP-connected E2E runner—to exercise the full app through a real browser session. (Getting TestSprite past Clerk sign-in took its own work; I wrote that up in [fixing TestSprite tests blocked by Clerk auth](/posts/testsprite-nextjs-clerk-auth/).)
 
 One case kept failing: **TC013**, “Billing page remains usable after returning from external checkout.” The report was blunt: hitting `/api/billing/checkout?plan=pro` returned **HTTP 500** with a generic browser error page—no JSON, no stack trace in the UI.
 
-![Optional hero image for the post](../../assets/images/testsprite-polar-checkout-bug.jpg)
+![Pixel-art retro computer showing a "Lucid Hire Debug Console" that traces TestSprite report TC013 to new URL() throwing on a relative success URL, fixed with resolveCheckoutSuccessUrl(), with Polar, Next.js and TestSprite logos below](../../assets/images/testsprite-polar-checkout-bug.jpg)
 
 This post is about how that failure was actually a gift: TestSprite reproduced a path I had not fully validated, and chasing it led to a concrete bug in how we integrated Polar—not “Polar is down,” but **our route crashing before the SDK could even run**.
 
@@ -167,4 +168,7 @@ After this change:
 - **E2E tools like TestSprite** are not only for “click happy paths.” They excel at **boring but exact repros**: same URL, same query string, same navigation semantics as production.
 - **Third-party adapters** (`@polar-sh/nextjs`) save time until they **hide thrown errors** or **parse env in ways that assume perfect configuration**. Sometimes owning the ten lines of SDK calls buys you **observability** and **control**.
 - **`POLAR_SUCCESS_URL` should be documented** next to tokens and product IDs: absolute URL preferred; if you use a path, we now resolve it—but you should still set **`NEXT_PUBLIC_APP_URL`** (or rely on `request.nextUrl.origin` in dev) so the base is correct behind proxies and tunnels.
+
 ---
+
+If you need help with billing or checkout in a Next.js app like this, [I take on freelance work](/hire/).

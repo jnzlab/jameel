@@ -15,7 +15,9 @@ export async function GET() {
       link: getPath(id, filePath),
       title: data.title,
       description: data.description,
-      pubDate: new Date(data.modDatetime ?? data.pubDatetime),
+      pubDate: new Date(data.pubDatetime),
+      author: `jameel@jnzlab.io (${data.author})`,
+      categories: data.tags,
     })),
   });
 }
