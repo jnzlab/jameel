@@ -5,28 +5,67 @@ import Main from "@/layouts/Main.astro";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
-import Card from "@/components/Card.astro";
+import CommitLog from "@/components/CommitLog.astro";
+import Tag from "@/components/Tag.astro";
 import Pagination from "@/components/Pagination.astro";
-import getSortedPosts from "@/utils/getSortedPosts";
+import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
+import getUniqueTags from "@/utils/getUniqueTags";
+import getPostsByTag from "@/utils/getPostsByTag";
+import postFilter from "@/utils/postFilter";
 import { SITE } from "@/config";
 
 export const getStaticPaths = (async ({ paginate }) => {
   const posts = await getCollection("blog", ({ data }) => !data.draft);
-  return paginate(getSortedPosts(posts), { pageSize: SITE.postPerPage });
+  // Paginate in publish order so the commit log reads continuously across pages
+  const sorted = posts
+    .filter(postFilter)
+    .sort((a, b) => b.data.pubDatetime.getTime() - a.data.pubDatetime.getTime());
+  return paginate(sorted, { pageSize: SITE.postPerPage });
 }) satisfies GetStaticPaths;
 
 const { page } = Astro.props;
+
+const allPosts = await getCollection("blog");
+const tags = getUniqueTags(allPosts)
+  .map(tag => ({ ...tag, count: getPostsByTag(allPosts, tag.tag).length }))
+  .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+
+// Show recurring topics; the full list lives on /tags
+const topTags = tags.filter(tag => tag.count > 1);
+const hiddenTags = tags.length - topTags.length;
 ---
 
-<Layout title={`Posts | ${SITE.title}`}>
+<Layout title={`Writing | ${SITE.title}`}>
   <Header />
-  <Main pageTitle="Posts" pageDesc="All the articles I've posted.">
-    <ul>
-      {page.data.map(data => <Card {...data} />)}
-    </ul>
+  <Main
+    pageTitle="Writing"
+    pageDesc="Fixes, guides, and lessons from shipping Next.js apps and running Fedora."
+    count={`${page.total} posts · ${tags.length} tags`}
+  >
+    <div class="mb-12 flex flex-col gap-3 sm:flex-row sm:items-baseline sm:gap-6">
+      <h2 class="type-meta shrink-0 text-ink-soft">Topics</h2>
+      <ul class="flex flex-wrap items-center gap-2">
+        {
+          topTags.map(({ tag, tagName, count }) => (
+            <Tag {tag} {tagName} {count} size="sm" />
+          ))
+        }
+        <li>
+          <a
+            href="/tags/"
+            class="type-meta ms-1 inline-flex items-center gap-1 text-cobalt underline decoration-cobalt/40 underline-offset-4 transition-colors hover:decoration-cobalt"
+          >
+            {hiddenTags > 0 ? `All ${tags.length} tags` : "All tags"}
+            <IconArrowRight class="size-3.5 rtl:rotate-180" aria-hidden="true" />
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <CommitLog posts={page.data} groupByYear headingLevel="h2" />
+
+    <Pagination {page} />
   </Main>
 
-  <Pagination {page} />
-
-  <Footer noMarginTop={page.lastPage > 1} />
+  <Footer />
 </Layout>

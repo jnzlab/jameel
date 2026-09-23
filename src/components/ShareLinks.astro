@@ -1,28 +1,92 @@
 ---
 import { SHARE_LINKS } from "@/constants";
-import LinkButton from "./LinkButton.astro";
 
+type Props = { class?: string };
+
+const { class: className = "" } = Astro.props;
 const URL = Astro.url;
 ---
 
-{
-  SHARE_LINKS.length > 0 && (
-    <div class="flex flex-none flex-col items-center justify-center gap-1 md:items-start">
-      <span class="italic">Share this post on:</span>
-      <div class="text-center">
-        {SHARE_LINKS.map(social => (
-          <LinkButton
+<div class:list={["flex flex-wrap items-center gap-x-3 gap-y-2", className]}>
+  <span class="type-meta text-ink-soft" id="share-label">Share</span>
+  <ul class="flex flex-wrap items-center gap-1.5" aria-labelledby="share-label">
+    {
+      SHARE_LINKS.map(social => (
+        <li>
+          <a
             href={`${social.href + URL}`}
             target="_blank"
             rel="noopener noreferrer"
-            class="scale-90 p-2 hover:rotate-6 sm:p-1"
             title={social.linkTitle}
+            class="grid size-9 place-items-center rounded-full border border-line text-ink-soft transition-colors hover:border-ink hover:text-ink"
           >
-            <social.icon class="inline-block size-6 scale-125 fill-transparent stroke-current stroke-2 opacity-90 group-hover:fill-transparent sm:scale-110" />
+            <social.icon class="size-[1.05rem]" aria-hidden="true" />
             <span class="sr-only">{social.linkTitle}</span>
-          </LinkButton>
-        ))}
-      </div>
-    </div>
-  )
-}
+          </a>
+        </li>
+      ))
+    }
+    <li>
+      <button
+        type="button"
+        data-copy-link
+        class="type-meta inline-flex h-9 items-center gap-1.5 rounded-full border border-line ps-3 pe-3.5 text-ink-soft transition-colors hover:border-ink hover:text-ink data-[copied=true]:border-cobalt data-[copied=true]:text-cobalt"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="size-4"
+          aria-hidden="true"
+          ><path d="M9 15l6 -6"></path><path
+            d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"></path><path
+            d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"
+          ></path></svg
+        >
+        <span data-copy-link-label>Copy link</span>
+      </button>
+      <span class="sr-only" role="status" aria-live="polite" data-copy-link-status></span>
+    </li>
+  </ul>
+</div>
+
+<script>
+  function setupCopyLink() {
+    document.querySelectorAll<HTMLButtonElement>("[data-copy-link]").forEach(btn => {
+      if (btn.dataset.bound) return;
+      btn.dataset.bound = "true";
+      const label = btn.querySelector<HTMLElement>("[data-copy-link-label]");
+      const status = btn.parentElement?.querySelector<HTMLElement>(
+        "[data-copy-link-status]"
+      );
+      let timer: number | undefined;
+
+      btn.addEventListener("click", async () => {
+        const url = window.location.href.split("#")[0];
+        let ok = true;
+        try {
+          await navigator.clipboard.writeText(url);
+        } catch {
+          ok = false;
+        }
+        const message = ok ? "Link copied" : "Copy failed";
+        if (label) label.textContent = message;
+        if (status) status.textContent = message;
+        btn.dataset.copied = String(ok);
+        window.clearTimeout(timer);
+        timer = window.setTimeout(() => {
+          if (label) label.textContent = "Copy link";
+          if (status) status.textContent = "";
+          btn.dataset.copied = "false";
+        }, 2000);
+      });
+    });
+  }
+
+  setupCopyLink();
+  document.addEventListener("astro:page-load", setupCopyLink);
+</script>

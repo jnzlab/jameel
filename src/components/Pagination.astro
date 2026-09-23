@@ -10,33 +10,40 @@ type Props = {
 };
 
 const { page } = Astro.props;
+
+const base =
+  "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold select-none transition-colors";
+const enabled = "border-line text-ink hover:border-ink hover:text-cobalt";
+const disabled = "cursor-not-allowed border-dashed border-line text-ink-soft/50";
 ---
 
 {
   page.lastPage > 1 && (
     <nav
-      class="mt-auto mb-8 flex justify-center"
+      class="mt-14 grid grid-cols-[1fr_auto_1fr] items-center gap-4 border-t border-line pt-6"
       role="navigation"
       aria-label="Pagination Navigation"
     >
       <LinkButton
         disabled={!page.url.prev}
         href={page.url.prev as string}
-        class:list={["me-4 select-none", { "opacity-50": !page.url.prev }]}
-        aria-label="Goto Previous Page"
+        class:list={[base, "justify-self-start", page.url.prev ? enabled : disabled]}
+        aria-label="Go to previous page (newer posts)"
       >
-        <IconArrowLeft class="inline-block rtl:rotate-180" />
-        Prev
+        <IconArrowLeft class="size-4 rtl:rotate-180" aria-hidden="true" />
+        Newer
       </LinkButton>
-      {page.currentPage} / {page.lastPage}
+      <p class="type-meta text-center text-ink-soft">
+        Page <span class="text-ink">{page.currentPage}</span> of {page.lastPage}
+      </p>
       <LinkButton
         disabled={!page.url.next}
         href={page.url.next as string}
-        class:list={["ms-4 select-none", { "opacity-50": !page.url.next }]}
-        aria-label="Goto Next Page"
+        class:list={[base, "justify-self-end", page.url.next ? enabled : disabled]}
+        aria-label="Go to next page (older posts)"
       >
-        Next
-        <IconArrowRight class="inline-block rtl:rotate-180" />
+        Older
+        <IconArrowRight class="size-4 rtl:rotate-180" aria-hidden="true" />
       </LinkButton>
     </nav>
   )

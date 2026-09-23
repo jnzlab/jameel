@@ -55,8 +55,9 @@ const structuredData = {
 >
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="canonical" href={canonicalURL} />
     <meta name="generator" content={Astro.generator} />
 
@@ -114,7 +115,8 @@ const structuredData = {
       href={new URL("rss.xml", Astro.site)}
     />
 
-    <meta name="theme-color" content="" />
+    <!-- Initial value = paper; src/scripts/theme.ts syncs it to the body bg at runtime -->
+    <meta name="theme-color" content="#eef0ea" />
 
     {
       // If PUBLIC_GOOGLE_SITE_VERIFICATION is set in the environment variable,

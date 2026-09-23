@@ -1,0 +1,34 @@
+---
+/**
+ * Left label column for home-page sections: heading, an optional true count,
+ * and an optional link. Sticks beside its content on wide screens.
+ */
+type Props = {
+  id: string;
+  title: string;
+  meta?: string;
+  link?: { href: string; label: string };
+};
+
+const { id, title, meta, link } = Astro.props;
+---
+
+<header class="md:sticky md:top-24 md:self-start">
+  <h2 id={id} class="type-heading text-[1.35rem] sm:text-2xl">{title}</h2>
+  {meta && <p class="type-meta mt-2 text-ink-soft">{meta}</p>}
+  {
+    link && (
+      <a
+        href={link.href}
+        class="group mt-5 inline-flex items-center gap-1.5 text-[0.95rem] font-semibold text-cobalt"
+      >
+        <span class="underline decoration-transparent decoration-[1.5px] underline-offset-4 transition-colors group-hover:decoration-current">
+          {link.label}
+        </span>
+        <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">
+          →
+        </span>
+      </a>
+    )
+  }
+</header>

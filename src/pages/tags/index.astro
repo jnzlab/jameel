@@ -2,22 +2,55 @@
 import { getCollection } from "astro:content";
 import Main from "@/layouts/Main.astro";
 import Layout from "@/layouts/Layout.astro";
-import Tag from "@/components/Tag.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import getUniqueTags from "@/utils/getUniqueTags";
+import getPostsByTag from "@/utils/getPostsByTag";
 import { SITE } from "@/config";
 
 const posts = await getCollection("blog");
 
-let tags = getUniqueTags(posts);
+const tags = getUniqueTags(posts)
+  .map(tag => ({ ...tag, count: getPostsByTag(posts, tag.tag).length }))
+  .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+
+const max = Math.max(...tags.map(t => t.count), 1);
+const postCount = posts.filter(p => !p.data.draft).length;
 ---
 
 <Layout title={`Tags | ${SITE.title}`}>
   <Header />
-  <Main pageTitle="Tags" pageDesc="All the tags used in posts.">
-    <ul class="flex flex-wrap gap-6">
-      {tags.map(({ tag, tagName }) => <Tag {tag} {tagName} />)}
+  <Main
+    pageTitle="Tags"
+    pageDesc="Every topic I've written about, most covered first."
+    count={`${tags.length} tags · ${postCount} posts`}
+  >
+    <ul class="tag-index grid gap-x-12 md:grid-cols-2">
+      {
+        tags.map(({ tag, tagName, count }) => (
+          <li>
+            <a
+              href={`/tags/${tag}/`}
+              class="group relative flex items-baseline justify-between gap-4 border-b border-line py-3.5"
+            >
+              <span
+                transition:name={tag}
+                class="font-mono text-[0.95rem] [font-stretch:87.5%] text-ink transition-colors group-hover:text-cobalt"
+              >
+                <span aria-hidden="true" class="text-ink-soft">#</span>{tagName}
+              </span>
+              <span class="type-meta text-ink-soft tabular-nums">
+                {count} {count === 1 ? "post" : "posts"}
+              </span>
+              <span
+                aria-hidden="true"
+                class="absolute bottom-[-1px] left-0 h-px bg-ink transition-colors group-hover:bg-cobalt"
+                style={{ width: `${(count / max) * 100}%` }}
+              />
+            </a>
+          </li>
+        ))
+      }
     </ul>
   </Main>
   <Footer />

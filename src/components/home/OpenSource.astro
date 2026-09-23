@@ -1,0 +1,36 @@
+---
+import type { Contribution } from "@/data/career";
+
+type Props = { contributions: readonly Contribution[] };
+const { contributions } = Astro.props;
+---
+
+<ul class="border-t border-line">
+  {
+    contributions.map(c => (
+      <li class="grid gap-x-10 gap-y-3 border-b border-line py-7 sm:grid-cols-[8rem_minmax(0,1fr)] lg:grid-cols-[8rem_minmax(0,1fr)_14rem]">
+        <h3 class="type-heading text-lg">{c.project}</h3>
+        <p class="max-w-prose text-ink-soft">{c.summary}</p>
+        <div class="flex flex-wrap items-center gap-2 sm:col-start-2 lg:col-start-auto lg:justify-end lg:self-start lg:pt-0.5">
+          {c.prs.map(pr => (
+            <a
+              href={pr.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="chip transition-colors hover:border-cobalt hover:text-cobalt"
+              aria-label={`${c.project} pull request ${pr.label}`}
+            >
+              PR {pr.label}
+            </a>
+          ))}
+          {c.merged && (
+            <span class="type-meta ms-1 inline-flex items-center gap-1.5 text-ink">
+              <span class="size-1.5 rounded-full bg-marigold" aria-hidden="true" />
+              Merged
+            </span>
+          )}
+        </div>
+      </li>
+    ))
+  }
+</ul>

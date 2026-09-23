@@ -1,5 +1,6 @@
 ---
 import { render, type CollectionEntry } from "astro:content";
+import { Image } from "astro:assets";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
@@ -9,10 +10,12 @@ import EditPost from "@/components/EditPost.astro";
 import ShareLinks from "@/components/ShareLinks.astro";
 import BackButton from "@/components/BackButton.astro";
 import BackToTopButton from "@/components/BackToTopButton.astro";
+import TableOfContents from "@/components/post/TableOfContents.astro";
 import { getPath } from "@/utils/getPath";
 import { slugifyStr } from "@/utils/slugify";
-import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
-import IconChevronRight from "@/assets/icons/IconChevronRight.svg";
+import { readingTime } from "@/utils/readingTime";
+import IconArrowLeft from "@/assets/icons/IconArrowLeft.svg";
+import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
 import { SITE } from "@/config";
 
 type Props = {
@@ -35,7 +38,7 @@ const {
   hideEditPost,
 } = post.data;
 
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 
 let ogImageUrl: string | undefined;
 
@@ -67,8 +70,47 @@ const layoutProps = {
   scrollSmooth: true,
 };
 
-/* ========== Prev/Next Posts ========== */
+/* ========== Hero image ==========
+ * Local ogImage assets become the hero figure. Most posts also open with the
+ * same image in the Markdown; when it sits in the lead (before the first
+ * section) we promote it to the hero, reuse its alt text and hide the inline
+ * copy. When it only appears deeper in the post, it stays in context there.
+ */
+const heroImage = typeof initOgImage === "object" && initOgImage?.src ? initOgImage : undefined;
 
+let heroAlt = "";
+let heroDuplicateKey: string | undefined;
+let showHero = !!heroImage;
+
+if (heroImage) {
+  // "/_astro/name.HASH.png" (build) or "/@fs/.../name.png?origWidth=…" (dev)
+  const file = heroImage.src.split("?")[0].split("/").pop() ?? "";
+  const base = file.replace(/\.[a-z0-9]+$/i, "").replace(/\.[\w-]{6,}$/, "");
+  const body = post.body ?? "";
+  const escaped = base.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = new RegExp(`!\\[([^\\]]*)\\]\\([^)]*${escaped}\\.[a-z]+\\)`, "i").exec(body);
+
+  if (match) {
+    const firstSection = body.search(/^##\s/m);
+    const inLead = firstSection === -1 || match.index < firstSection;
+    if (inLead) {
+      heroAlt = match[1];
+      heroDuplicateKey = base;
+    } else {
+      showHero = false;
+    }
+  }
+}
+
+/* ========== Table of contents ========== */
+const tocHeadings = headings.filter(
+  h => (h.depth === 2 || h.depth === 3) && h.slug !== "table-of-contents"
+);
+const showToc = tocHeadings.length >= 3;
+
+const minutes = readingTime(post.body);
+
+/* ========== Newer/Older posts ========== */
 const allPosts = posts.map(({ data: { title }, id, filePath }) => ({
   id,
   title,
@@ -77,209 +119,400 @@ const allPosts = posts.map(({ data: { title }, id, filePath }) => ({
 
 const currentPostIndex = allPosts.findIndex(a => a.id === post.id);
 
-const prevPost = currentPostIndex !== 0 ? allPosts[currentPostIndex - 1] : null;
-const nextPost =
-  currentPostIndex !== allPosts.length ? allPosts[currentPostIndex + 1] : null;
+// `posts` is sorted newest first
+const newerPost = currentPostIndex > 0 ? allPosts[currentPostIndex - 1] : null;
+const olderPost =
+  currentPostIndex >= 0 && currentPostIndex < allPosts.length - 1
+    ? allPosts[currentPostIndex + 1]
+    : null;
 ---
 
 <Layout {...layoutProps}>
   <Header />
-  <BackButton />
+  <div
+    id="reading-progress"
+    class="pointer-events-none fixed inset-x-0 top-16 z-50 h-0.5 origin-left scale-x-0 bg-marigold rtl:origin-right"
+    aria-hidden="true"
+    data-pagefind-ignore
+  >
+  </div>
+
+  {
+    heroDuplicateKey && (
+      <style
+        is:inline
+        set:html={`#article p:has(> img[src*="${heroDuplicateKey.replace(/["\\]/g, "")}"]:only-child){display:none}`}
+      />
+    )
+  }
+
   <main
     id="main-content"
-    class:list={["app-layout pb-12", { "mt-8": !SITE.showBackButton }]}
+    tabindex="-1"
+    class="app-layout pt-8 pb-24 focus:outline-none sm:pt-10"
     data-pagefind-body
   >
-    <h1
-      transition:name={slugifyStr(title.replaceAll(".", "-"))}
-      class="inline-block text-2xl font-bold text-accent sm:text-3xl"
-    >
-      {title}
-    </h1>
-    <div class="my-2 flex items-center gap-2">
-      <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
-      <span
-        aria-hidden="true"
-        class:list={[
-          "max-sm:hidden",
-          { hidden: !SITE.editPost.enabled || hideEditPost },
-        ]}>|</span
-      >
-      <EditPost {hideEditPost} {post} class="max-sm:hidden" />
+    <div class="post-grid" data-has-toc={showToc ? "true" : undefined}>
+      <header class="post-header">
+        <BackButton class="mb-8 sm:mb-10" />
+
+        <h1
+          transition:name={slugifyStr(title.replaceAll(".", "-"))}
+          class="type-heading post-title text-ink"
+        >
+          {title}
+        </h1>
+
+        <p class="post-standfirst mt-5 text-ink-soft">{description}</p>
+
+        <div class="mt-7 flex flex-col gap-3 border-t border-line pt-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+          <p class="type-meta flex flex-wrap items-center gap-x-3 gap-y-1 text-ink-soft">
+            <Datetime {pubDatetime} {modDatetime} {timezone} display="both" />
+            <span aria-hidden="true" class="text-line">/</span>
+            <span><span class="text-ink">{minutes}</span> min read</span>
+          </p>
+          <ul class="flex flex-wrap gap-1.5 sm:justify-end" aria-label="Tags" data-pagefind-ignore>
+            {
+              tags.slice(0, 4).map(tag => (
+                <li>
+                  <a
+                    href={`/tags/${slugifyStr(tag)}/`}
+                    class="chip transition-colors hover:border-ink hover:text-ink"
+                  >
+                    <span aria-hidden="true" class="me-0.5">#</span>{tag}
+                  </a>
+                </li>
+              ))
+            }
+            {
+              tags.length > 4 && (
+                <li>
+                  <a href="#post-tags" class="chip transition-colors hover:border-ink hover:text-ink">
+                    +{tags.length - 4}
+                    <span class="sr-only">more tags</span>
+                  </a>
+                </li>
+              )
+            }
+          </ul>
+        </div>
+      </header>
+
+      {
+        showHero && heroImage && (
+          <figure class="post-hero">
+            <Image
+              src={heroImage}
+              alt={heroAlt}
+              widths={[640, 960, 1280, 1920]}
+              sizes="(min-width: 1280px) 1024px, (min-width: 768px) 90vw, 100vw"
+              loading="eager"
+              fetchpriority="high"
+              class="block h-auto w-full rounded-[0.6rem]"
+            />
+          </figure>
+        )
+      }
+
+      <div class="post-body">
+        {
+          showToc && (
+            <TableOfContents headings={tocHeadings} variant="inline" class="mb-10 xl:hidden" />
+          )
+        }
+
+        <article
+          id="article"
+          class="app-prose"
+          data-has-toc={showToc ? "true" : undefined}
+        >
+          <Content />
+        </article>
+
+        <footer class="mt-16 border-t border-line pt-8" data-pagefind-ignore>
+          <div class="flex flex-col gap-6">
+            <div id="post-tags" class="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <span class="type-meta text-ink-soft">Filed under</span>
+              <ul class="flex flex-wrap gap-1.5">
+                {tags.map(tag => <Tag tag={slugifyStr(tag)} tagName={tag} size="sm" />)}
+              </ul>
+            </div>
+
+
+            <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
+              <ShareLinks />
+              <EditPost {hideEditPost} {post} />
+            </div>
+          </div>
+
+          {
+            (olderPost || newerPost) && (
+              <nav aria-label="More posts" class="mt-12 grid gap-3 sm:grid-cols-2">
+                {olderPost && (
+                  <a
+                    href={getPath(olderPost.id, olderPost.filePath)}
+                    class="post-pager group"
+                    rel="prev"
+                  >
+                    <span class="type-meta flex items-center gap-2 text-ink-soft">
+                      <IconArrowLeft
+                        class="size-3.5 transition-transform duration-200 group-hover:-translate-x-0.5 rtl:rotate-180"
+                        aria-hidden="true"
+                      />
+                      Older post
+                    </span>
+                    <span class="post-pager__title">{olderPost.title}</span>
+                  </a>
+                )}
+                {newerPost && (
+                  <a
+                    href={getPath(newerPost.id, newerPost.filePath)}
+                    class="post-pager group sm:col-start-2 sm:text-end"
+                    rel="next"
+                  >
+                    <span class="type-meta flex items-center gap-2 text-ink-soft sm:justify-end">
+                      Newer post
+                      <IconArrowRight
+                        class="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5 rtl:rotate-180"
+                        aria-hidden="true"
+                      />
+                    </span>
+                    <span class="post-pager__title">{newerPost.title}</span>
+                  </a>
+                )}
+              </nav>
+            )
+          }
+        </footer>
+      </div>
+
+      {
+        showToc && (
+          <aside class="post-rail hidden xl:block">
+            <div class="sticky top-24">
+              <TableOfContents headings={tocHeadings} variant="rail" />
+            </div>
+          </aside>
+        )
+      }
     </div>
-    <article
-      id="article"
-      class="app-prose mt-8 w-full max-w-app prose-pre:bg-(--shiki-light-bg) dark:prose-pre:bg-(--shiki-dark-bg)"
-    >
-      <Content />
-    </article>
-
-    <hr class="my-8 border-dashed" />
-
-    <EditPost class="sm:hidden" {hideEditPost} {post} />
-
-    <ul class="mt-4 mb-8 flex flex-wrap gap-4 sm:my-8">
-      {tags.map(tag => <Tag tag={slugifyStr(tag)} tagName={tag} size="sm" />)}
-    </ul>
 
     <BackToTopButton />
-
-    <ShareLinks />
-
-    <hr class="my-6 border-dashed" />
-
-    <!-- Previous/Next Post Buttons -->
-    <div data-pagefind-ignore class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-      {
-        prevPost && (
-          <a
-            href={getPath(prevPost.id, prevPost.filePath)}
-            class="flex w-full gap-1 hover:opacity-75"
-          >
-            <IconChevronLeft class="inline-block flex-none rtl:rotate-180" />
-            <div>
-              <span>Previous Post</span>
-              <div class="text-sm text-accent/85">{prevPost.title}</div>
-            </div>
-          </a>
-        )
-      }
-      {
-        nextPost && (
-          <a
-            href={getPath(nextPost.id, nextPost.filePath)}
-            class="flex w-full justify-end gap-1 text-end hover:opacity-75 sm:col-start-2"
-          >
-            <div>
-              <span>Next Post</span>
-              <div class="text-sm text-accent/85">{nextPost.title}</div>
-            </div>
-            <IconChevronRight class="inline-block flex-none rtl:rotate-180" />
-          </a>
-        )
-      }
-    </div>
   </main>
   <Footer />
 </Layout>
 
+<style>
+  .post-grid {
+    --measure: 42rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    max-width: var(--measure);
+    margin-inline: auto;
+  }
+
+  @media (min-width: 80rem) {
+    .post-grid {
+      --rail: 14rem;
+      max-width: calc(var(--measure) + var(--rail) + 4rem);
+      grid-template-columns: minmax(0, var(--measure)) var(--rail);
+      column-gap: 4rem;
+    }
+    .post-header,
+    .post-hero {
+      grid-column: 1 / -1;
+    }
+    .post-body {
+      grid-column: 1;
+    }
+    .post-rail {
+      grid-column: 2;
+      grid-row: span 1;
+    }
+    .post-grid:not([data-has-toc]) {
+      max-width: var(--measure);
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .post-title {
+    font-size: clamp(1.6rem, 1.05rem + 2.6vw, 2.75rem);
+    line-height: 1.12;
+    letter-spacing: -0.035em;
+    max-width: 28ch;
+  }
+
+  .post-standfirst {
+    font-size: clamp(1.125rem, 1.05rem + 0.35vw, 1.3rem);
+    line-height: 1.5;
+    max-width: 40rem;
+  }
+
+  .post-hero {
+    margin-top: 2.5rem;
+    margin-bottom: 3rem;
+    padding: 0.5rem;
+    border: 1px solid var(--line);
+    border-radius: 1rem;
+    background: var(--surface);
+  }
+  @media (min-width: 640px) {
+    .post-hero {
+      padding: 0.75rem;
+    }
+  }
+  .post-grid:not(:has(.post-hero)) .post-body,
+  .post-grid:not(:has(.post-hero)) .post-rail {
+    margin-top: 3rem;
+  }
+
+  .post-pager {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1.25rem 1.25rem 1.4rem;
+    border: 1px solid var(--line);
+    border-radius: 0.9rem;
+    transition:
+      border-color 150ms,
+      background-color 150ms;
+  }
+  .post-pager:hover {
+    border-color: var(--ink);
+    background: var(--surface);
+  }
+  .post-pager__title {
+    font-weight: 650;
+    font-size: 1.05rem;
+    line-height: 1.35;
+    text-wrap: balance;
+    color: var(--ink);
+    transition: color 150ms;
+  }
+  .post-pager:hover .post-pager__title {
+    color: var(--cobalt);
+  }
+</style>
+
 <script is:inline data-astro-rerun>
-  /** Create a progress indicator
-   *  at the top */
-  function createProgressBar() {
-    // Create the main container div
-    const progressContainer = document.createElement("div");
-    progressContainer.className =
-      "progress-container fixed top-0 z-10 h-1 w-full bg-background";
+  (() => {
+    const article = document.querySelector("#article");
+    if (!article) return;
 
-    // Create the progress bar div
-    const progressBar = document.createElement("div");
-    progressBar.className = "progress-bar h-1 w-0 bg-accent";
-    progressBar.id = "myBar";
+    // Remove listeners left behind by the previous post (view transitions)
+    window.__postAbort?.abort();
+    const controller = new AbortController();
+    window.__postAbort = controller;
+    const { signal } = controller;
 
-    // Append the progress bar to the progress container
-    progressContainer.appendChild(progressBar);
+    /** Reading progress: 2px marigold line under the sticky header. */
+    const bar = document.getElementById("reading-progress");
+    if (bar) {
+      let ticking = false;
+      const update = () => {
+        const root = document.documentElement;
+        const total = root.scrollHeight - root.clientHeight;
+        const ratio = total > 0 ? Math.min(1, root.scrollTop / total) : 0;
+        bar.style.transform = `scaleX(${ratio})`;
+        ticking = false;
+      };
+      update();
+      document.addEventListener(
+        "scroll",
+        () => {
+          if (ticking) return;
+          ticking = true;
+          requestAnimationFrame(update);
+        },
+        { passive: true, signal }
+      );
+    }
 
-    // Append the progress container to the document body or any other desired parent element
-    document.body.appendChild(progressContainer);
-  }
-  createProgressBar();
-
-  /** Update the progress bar
-   *  when user scrolls */
-  function updateScrollProgress() {
-    document.addEventListener("scroll", () => {
-      const winScroll =
-        document.body.scrollTop || document.documentElement.scrollTop;
-      const height =
-        document.documentElement.scrollHeight -
-        document.documentElement.clientHeight;
-      const scrolled = (winScroll / height) * 100;
-      if (document) {
-        const myBar = document.getElementById("myBar");
-        if (myBar) {
-          myBar.style.width = scrolled + "%";
-        }
-      }
-    });
-  }
-  updateScrollProgress();
-
-  /** Attaches links to headings in the document,
-   *  allowing sharing of sections easily */
-  function addHeadingLinks() {
-    const headings = Array.from(
-      document.querySelectorAll("h2, h3, h4, h5, h6")
-    );
-    for (const heading of headings) {
-      heading.classList.add("group");
+    /** Anchor links on headings so sections can be shared. */
+    for (const heading of article.querySelectorAll("h2[id], h3[id], h4[id], h5[id], h6[id]")) {
+      if (heading.querySelector(".heading-link")) continue;
       const link = document.createElement("a");
-      link.className =
-        "heading-link ms-2 no-underline opacity-75 md:opacity-0 md:group-hover:opacity-100 md:focus:opacity-100";
+      link.className = "heading-link";
       link.href = "#" + heading.id;
-
+      link.setAttribute("aria-label", `Link to section: ${heading.textContent?.trim()}`);
       const span = document.createElement("span");
-      span.ariaHidden = "true";
-      span.innerText = "#";
+      span.setAttribute("aria-hidden", "true");
+      span.textContent = "#";
       link.appendChild(span);
       heading.appendChild(link);
     }
-  }
-  addHeadingLinks();
 
-  /** Attaches copy buttons to code blocks in the document,
-   * allowing users to copy code easily. */
-  function attachCopyButtons() {
-    const copyButtonLabel = "Copy";
-    const codeBlocks = Array.from(document.querySelectorAll("pre"));
+    /** Wrap code blocks in a panel with a header bar (file name or language + copy). */
+    const copyLabel = "Copy";
+    for (const pre of article.querySelectorAll("pre.astro-code")) {
+      if (pre.parentElement?.classList.contains("code-block")) continue;
 
-    for (const codeBlock of codeBlocks) {
       const wrapper = document.createElement("div");
-      wrapper.style.position = "relative";
+      wrapper.className = "code-block";
 
-      // Check if --file-name-offset custom property exists
-      const computedStyle = getComputedStyle(codeBlock);
-      const hasFileNameOffset =
-        computedStyle.getPropertyValue("--file-name-offset").trim() !== "";
+      const bar = document.createElement("div");
+      bar.className = "code-block__bar";
 
-      // Determine the top positioning class
-      const topClass = hasFileNameOffset
-        ? "top-(--file-name-offset)"
-        : "-top-3";
+      // File name tab from the transformerFileName shiki transformer
+      const fileTab = Array.from(pre.children).find(
+        el => el.tagName === "SPAN" && !el.classList.contains("line")
+      );
+      const name = document.createElement("span");
+      if (fileTab) {
+        name.className = "code-block__file";
+        name.textContent = fileTab.textContent ?? "";
+        fileTab.remove();
+        wrapper.dataset.file = "true";
+      } else {
+        name.className = "code-block__lang";
+        const lang = pre.getAttribute("data-language") ?? "";
+        name.textContent = ["plaintext", "text", "txt", ""].includes(lang) ? "" : lang;
+      }
 
-      const copyButton = document.createElement("button");
-      copyButton.className = `copy-code absolute end-3 ${topClass} rounded bg-muted border border-muted px-2 py-1 text-xs leading-4 text-foreground font-medium`;
-      copyButton.innerHTML = copyButtonLabel;
-      codeBlock.setAttribute("tabindex", "0");
-      codeBlock.appendChild(copyButton);
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "copy-code";
+      button.textContent = copyLabel;
+      button.setAttribute("aria-label", "Copy code to clipboard");
 
-      // wrap codebock with relative parent element
-      codeBlock?.parentNode?.insertBefore(wrapper, codeBlock);
-      wrapper.appendChild(codeBlock);
+      bar.append(name, button);
+      pre.setAttribute("tabindex", "0");
+      pre.parentNode?.insertBefore(wrapper, pre);
+      wrapper.append(bar, pre);
 
-      copyButton.addEventListener("click", async () => {
-        await copyCode(codeBlock, copyButton);
+      button.addEventListener("click", async () => {
+        const text = pre.querySelector("code")?.innerText ?? "";
+        try {
+          await navigator.clipboard.writeText(text);
+          button.textContent = "Copied";
+          button.dataset.copied = "true";
+        } catch {
+          button.textContent = "Failed";
+        }
+        setTimeout(() => {
+          button.textContent = copyLabel;
+          delete button.dataset.copied;
+        }, 1400);
       });
     }
 
-    async function copyCode(block, button) {
-      const code = block.querySelector("code");
-      const text = code?.innerText;
-
-      await navigator.clipboard.writeText(text ?? "");
-
-      // visual feedback that task is completed
-      button.innerText = "Copied";
-
-      setTimeout(() => {
-        button.innerText = copyButtonLabel;
-      }, 700);
+    /** Let wide tables scroll inside the column. */
+    for (const table of article.querySelectorAll("table")) {
+      if (table.parentElement?.classList.contains("table-wrap")) continue;
+      const wrap = document.createElement("div");
+      wrap.className = "table-wrap";
+      wrap.setAttribute("tabindex", "0");
+      wrap.setAttribute("role", "region");
+      wrap.setAttribute("aria-label", "Table");
+      table.parentNode?.insertBefore(wrap, table);
+      wrap.appendChild(table);
     }
-  }
-  attachCopyButtons();
 
-  /* Go to page start after page swap */
-  document.addEventListener("astro:after-swap", () =>
-    window.scrollTo({ left: 0, top: 0, behavior: "instant" })
-  );
+    /* Go to page start after page swap */
+    document.addEventListener(
+      "astro:after-swap",
+      () => window.scrollTo({ left: 0, top: 0, behavior: "instant" }),
+      { signal }
+    );
+  })();
 </script>

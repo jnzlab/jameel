@@ -5,8 +5,9 @@ import Main from "@/layouts/Main.astro";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
-import Card from "@/components/Card.astro";
+import CommitLog from "@/components/CommitLog.astro";
 import Pagination from "@/components/Pagination.astro";
+import IconArrowLeft from "@/assets/icons/IconArrowLeft.svg";
 import getUniqueTags from "@/utils/getUniqueTags";
 import getPostsByTag from "@/utils/getPostsByTag";
 import { SITE } from "@/config";
@@ -16,7 +17,10 @@ export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
   const tags = getUniqueTags(posts);
 
   return tags.flatMap(({ tag, tagName }) => {
-    const tagPosts = getPostsByTag(posts, tag);
+    // Publish order keeps the commit log continuous across pages
+    const tagPosts = getPostsByTag(posts, tag).sort(
+      (a, b) => b.data.pubDatetime.getTime() - a.data.pubDatetime.getTime()
+    );
 
     return paginate(tagPosts, {
       params: { tag },
@@ -31,20 +35,28 @@ const { tag } = params;
 const { page, tagName } = Astro.props;
 ---
 
-<Layout title={`Tag: ${tagName} | ${SITE.title}`}>
+<Layout title={`Tagged ${tagName} | ${SITE.title}`}>
   <Header />
   <Main
-    pageTitle={[`Tag:`, `${tagName}`]}
+    pageTitle={["Tagged", `${tagName}`]}
     titleTransition={tag}
-    pageDesc={`All the articles with the tag "${tagName}".`}
+    pageDesc={`Everything I've written about ${tagName}, newest first.`}
+    count={`${page.total} ${page.total === 1 ? "post" : "posts"}`}
   >
-    <h1 slot="title" transition:name={tag}>{`Tag:${tag}`}</h1>
-    <ul>
-      {page.data.map(data => <Card {...data} />)}
-    </ul>
+    <CommitLog posts={page.data} groupByYear headingLevel="h2" />
+
+    <Pagination {page} />
+
+    <p class="mt-14 type-meta">
+      <a
+        href="/tags/"
+        class="inline-flex items-center gap-1.5 text-cobalt underline decoration-cobalt/40 underline-offset-4 transition-colors hover:decoration-cobalt"
+      >
+        <IconArrowLeft class="size-3.5 rtl:rotate-180" aria-hidden="true" />
+        All tags
+      </a>
+    </p>
   </Main>
 
-  <Pagination {page} />
-
-  <Footer noMarginTop={page.lastPage > 1} />
+  <Footer />
 </Layout>

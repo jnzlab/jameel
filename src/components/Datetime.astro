@@ -2,7 +2,6 @@
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import IconCalendar from "@/assets/icons/IconCalendar.svg";
 import { SITE } from "@/config";
 
 dayjs.extend(utc);
@@ -10,46 +9,69 @@ dayjs.extend(timezone);
 
 type Props = {
   class?: string;
+  /** Kept for backwards compatibility; "lg" bumps the size slightly. */
   size?: "sm" | "lg";
   pubDatetime: string | Date;
   timezone?: string;
   modDatetime?: string | Date | null;
+  /**
+   * "latest" (default) shows one date: the update date when the post was
+   * modified, otherwise the publish date. "both" shows the publish date and,
+   * when modified, the update date after it.
+   */
+  display?: "latest" | "both";
 };
 
 const {
   pubDatetime,
   modDatetime,
   size = "sm",
+  display = "latest",
   class: className = "",
   timezone: postTimezone,
 } = Astro.props;
 
-/* ========== Formatted Datetime ========== */
-const isModified = modDatetime && modDatetime > pubDatetime;
+const tz = postTimezone || SITE.timezone;
+const isModified = !!modDatetime && modDatetime > pubDatetime;
 
-const datetime = dayjs(isModified ? modDatetime : pubDatetime).tz(
-  postTimezone || SITE.timezone
-);
+const published = dayjs(pubDatetime).tz(tz);
+const updated = isModified ? dayjs(modDatetime).tz(tz) : null;
 
-const date = datetime.format("D MMM, YYYY"); // e.g., '22 Mar, 2025'
+const fmt = (d: dayjs.Dayjs) => d.format("D MMM YYYY"); // e.g. '22 Mar 2025'
 ---
 
-<div class:list={["flex items-center gap-x-2 opacity-80", className]}>
-  <IconCalendar
-    class:list={[
-      "inline-block size-6 min-w-5.5",
-      { "scale-90": size === "sm" },
-    ]}
-  />
+<span
+  class:list={[
+    "type-meta inline-flex flex-wrap items-center gap-x-3 gap-y-1 text-ink-soft",
+    { "text-[0.8rem]": size === "lg" },
+    className,
+  ]}
+>
   {
-    isModified && (
-      <span class:list={["text-sm", { "sm:text-base": size === "lg" }]}>
-        Updated:
+    display === "both" ? (
+      <>
+        <span>
+          Published{" "}
+          <time class="text-ink" datetime={published.toISOString()}>
+            {fmt(published)}
+          </time>
+        </span>
+        {updated && (
+          <span>
+            Updated{" "}
+            <time class="text-ink" datetime={updated.toISOString()}>
+              {fmt(updated)}
+            </time>
+          </span>
+        )}
+      </>
+    ) : (
+      <span>
+        {updated && <>Updated </>}
+        <time datetime={(updated ?? published).toISOString()}>
+          {fmt(updated ?? published)}
+        </time>
       </span>
     )
   }
-  <time
-    class:list={["text-sm", { "sm:text-base": size === "lg" }]}
-    datetime={datetime.toISOString()}>{date}</time
-  >
-</div>
+</span>

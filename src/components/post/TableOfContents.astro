@@ -1,0 +1,198 @@
+---
+/**
+ * "On this page" navigation built from the post's rendered headings.
+ * variant="rail": sticky right-rail list (xl screens).
+ * variant="inline": collapsible <details> shown above the article on smaller screens.
+ * The active section is tracked by one shared script (IntersectionObserver).
+ */
+import type { MarkdownHeading } from "astro";
+
+type Props = {
+  headings: MarkdownHeading[];
+  variant?: "rail" | "inline";
+  class?: string;
+};
+
+const { headings, variant = "rail", class: className = "" } = Astro.props;
+---
+
+{
+  variant === "rail" ? (
+    <nav
+      aria-label="On this page"
+      class:list={["toc toc--rail", className]}
+      data-toc
+      data-pagefind-ignore
+    >
+      <p class="type-meta mb-3 text-ink-soft">On this page</p>
+      <ol class="toc-list">
+        {headings.map(h => (
+          <li class:list={["toc-item", { "toc-item--sub": h.depth === 3 }]}>
+            <a href={`#${h.slug}`} data-toc-link={h.slug}>
+              {h.text}
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  ) : (
+    <details
+      class:list={["toc toc--inline group/toc", className]}
+      data-pagefind-ignore
+    >
+      <summary class="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 [&::-webkit-details-marker]:hidden">
+        <span class="type-meta text-ink">On this page</span>
+        <span class="type-meta flex items-center gap-2 text-ink-soft">
+          {headings.filter(h => h.depth === 2).length} sections
+          <svg
+            class="size-4 transition-transform duration-200 group-open/toc:rotate-180"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M6 9l6 6l6 -6" />
+          </svg>
+        </span>
+      </summary>
+      <nav aria-label="On this page" class="border-t border-line px-4 pt-3 pb-4" data-toc>
+        <ol class="toc-list">
+          {headings.map(h => (
+            <li class:list={["toc-item", { "toc-item--sub": h.depth === 3 }]}>
+              <a href={`#${h.slug}`} data-toc-link={h.slug}>
+                {h.text}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    </details>
+  )
+}
+
+<style>
+  .toc--rail {
+    max-height: calc(100svh - 7rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+
+  .toc--inline {
+    border: 1px solid var(--line);
+    border-radius: 0.75rem;
+    background: var(--surface);
+  }
+
+  .toc-list {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    border-inline-start: 1px solid var(--line);
+  }
+
+  .toc-item a {
+    position: relative;
+    display: block;
+    padding: 0.3rem 0 0.3rem 0.9rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: var(--ink-soft);
+    text-wrap: pretty;
+    transition: color 150ms;
+  }
+  .toc-item--sub a {
+    padding-inline-start: 1.7rem;
+    font-size: 0.82rem;
+  }
+  .toc-item a:hover {
+    color: var(--ink);
+  }
+
+  /* Active section: marigold tick on the rule, ink text */
+  .toc-item a::before {
+    content: "";
+    position: absolute;
+    inset-block: 0.35rem;
+    inset-inline-start: -1px;
+    width: 2px;
+    border-radius: 2px;
+    background: var(--marigold);
+    scale: 1 0;
+    transition: scale 200ms ease;
+  }
+  .toc-item a[aria-current="true"] {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .toc-item a[aria-current="true"]::before {
+    scale: 1 1;
+  }
+</style>
+
+<script>
+  let observer: IntersectionObserver | undefined;
+
+  function setupToc() {
+    observer?.disconnect();
+    const navs = document.querySelectorAll<HTMLElement>("[data-toc]");
+    if (!navs.length) return;
+
+    const links = Array.from(
+      document.querySelectorAll<HTMLAnchorElement>("[data-toc-link]")
+    );
+    const slugs = [...new Set(links.map(l => l.dataset.tocLink!))];
+    const headings = slugs
+      .map(slug => document.getElementById(slug))
+      .filter((el): el is HTMLElement => !!el);
+    if (!headings.length) return;
+
+    const setActive = (slug: string | null) => {
+      for (const link of links) {
+        if (link.dataset.tocLink === slug) link.setAttribute("aria-current", "true");
+        else link.removeAttribute("aria-current");
+      }
+      // Keep the active item in view inside a scrollable rail
+      const railLink = document.querySelector<HTMLElement>(
+        `.toc--rail [data-toc-link="${slug}"]`
+      );
+      const rail = railLink?.closest<HTMLElement>(".toc--rail");
+      if (railLink && rail && rail.scrollHeight > rail.clientHeight) {
+        const top = railLink.offsetTop - rail.clientHeight / 2;
+        rail.scrollTo({ top, behavior: "smooth" });
+      }
+    };
+
+    // The active section is the last heading that has crossed the top band.
+    const update = () => {
+      const threshold = window.innerHeight * 0.3;
+      let current: HTMLElement | null = null;
+      for (const h of headings) {
+        if (h.getBoundingClientRect().top <= threshold) current = h;
+        else break;
+      }
+      setActive(current?.id ?? null);
+    };
+
+    observer = new IntersectionObserver(update, {
+      rootMargin: "0px 0px -70% 0px",
+      threshold: [0, 1],
+    });
+    headings.forEach(h => observer!.observe(h));
+    update();
+
+    // Collapse the inline TOC after picking a section on small screens
+    document.querySelectorAll<HTMLDetailsElement>(".toc--inline").forEach(d => {
+      d.querySelectorAll("a").forEach(a =>
+        a.addEventListener("click", () => d.removeAttribute("open"))
+      );
+    });
+  }
+
+  document.addEventListener("astro:page-load", setupToc);
+  document.addEventListener("astro:before-swap", () => observer?.disconnect());
+</script>

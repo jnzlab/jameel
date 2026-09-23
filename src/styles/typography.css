@@ -1,119 +1,518 @@
+/*
+ * Long-form reading styles ("app-prose") for posts and the about page.
+ * The typography plugin stays loaded so `prose-*` variants used in markup keep
+ * working, but the look is defined here against the design tokens.
+ */
 @plugin "@tailwindcss/typography";
 
-@layer base {
-  /* ===== Override default Tailwind Typography styles ===== */
+@layer components {
   .app-prose {
-    @apply prose;
+    --prose-gap: 1.35em;
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    color: var(--ink);
+    overflow-wrap: break-word;
 
-    h1,
+    @media (min-width: 640px) {
+      font-size: 1.125rem;
+    }
+
+    > :first-child {
+      margin-top: 0;
+    }
+
+    /* ----- Flow ----- */
+    p,
+    ul,
+    ol,
+    blockquote,
+    figure,
+    table,
+    .table-wrap,
+    details,
+    pre,
+    .code-block {
+      margin-block: var(--prose-gap);
+    }
+
+    strong {
+      font-weight: 650;
+      color: var(--ink);
+    }
+
+    /* ----- Headings ----- */
     h2,
     h3,
     h4,
-    th {
-      @apply mb-3 text-foreground;
+    h5,
+    h6 {
+      position: relative;
+      font-family: var(--font-display);
+      font-stretch: 100%;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      scroll-margin-top: 6rem;
     }
+    h2 {
+      margin-top: 2.9em;
+      margin-bottom: 0.9em;
+      font-size: 1.18em;
+      line-height: 1.3;
 
+      @media (min-width: 640px) {
+        font-size: 1.3em;
+      }
+    }
     h3 {
-      @apply italic;
+      margin-top: 2.2em;
+      margin-bottom: 0.7em;
+      font-size: 1.05em;
+      line-height: 1.4;
+    }
+    h4,
+    h5,
+    h6 {
+      margin-top: 1.8em;
+      margin-bottom: 0.5em;
+      font-size: 0.8em;
+      font-stretch: 87.5%;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      line-height: 1.45;
+    }
+    h2 + *,
+    h3 + *,
+    h4 + * {
+      margin-top: 0;
     }
 
-    p,
-    strong,
-    ol,
+    /* Anchor link appended by the post script */
+    .heading-link {
+      margin-inline-start: 0.45em;
+      font-weight: 400;
+      color: var(--ink-soft);
+      text-decoration: none;
+      opacity: 0;
+      transition:
+        opacity 150ms,
+        color 150ms;
+    }
+    :is(h2, h3, h4, h5, h6):hover .heading-link,
+    .heading-link:focus-visible {
+      opacity: 1;
+    }
+    .heading-link:hover {
+      color: var(--cobalt);
+    }
+    @media (hover: none) {
+      .heading-link {
+        opacity: 0.45;
+      }
+    }
+
+    /* ----- Links ----- */
+    a:not(.heading-link) {
+      color: inherit;
+      text-decoration-line: underline;
+      text-decoration-color: color-mix(in oklab, var(--cobalt) 50%, transparent);
+      text-decoration-thickness: 1.5px;
+      text-underline-offset: 0.22em;
+      overflow-wrap: anywhere;
+      transition:
+        color 150ms,
+        text-decoration-color 150ms;
+    }
+    a:not(.heading-link):hover {
+      color: var(--cobalt);
+      text-decoration-color: var(--cobalt);
+    }
+
+    /* ----- Lists ----- */
     ul,
-    figcaption,
-    table,
-    code {
-      @apply text-foreground;
+    ol {
+      padding-inline-start: 1.4em;
     }
-
-    a {
-      @apply wrap-break-word text-foreground decoration-dashed underline-offset-4 hover:text-accent focus-visible:no-underline;
-    }
-
     ul {
-      @apply overflow-x-clip;
+      list-style: none;
+    }
+    ul > li {
+      position: relative;
+    }
+    ul > li::before {
+      content: "";
+      position: absolute;
+      top: 0.72em;
+      inset-inline-start: -1.05em;
+      width: 0.4em;
+      height: 0.4em;
+      border-radius: 999px;
+      background: var(--marigold);
+    }
+    ul ul > li::before {
+      background: transparent;
+      box-shadow: inset 0 0 0 1.5px var(--marigold);
+    }
+    ol {
+      list-style: decimal;
+    }
+    ol > li::marker {
+      font-family: var(--font-mono);
+      font-stretch: 87.5%;
+      font-size: 0.8em;
+      font-weight: 500;
+      color: var(--ink-soft);
+    }
+    li {
+      margin-block: 0.4em;
+      padding-inline-start: 0.2em;
+    }
+    li > ul,
+    li > ol {
+      margin-block: 0.4em;
+    }
+    li > p {
+      margin-block: 0.5em;
     }
 
-    li {
-      @apply marker:text-accent;
+    /* ----- Callout blockquote ----- */
+    blockquote {
+      padding: 0.9em 1.15em;
+      border-inline-start: 3px solid var(--marigold);
+      border-radius: 0 0.6rem 0.6rem 0;
+      background: var(--surface);
+      color: var(--ink);
+      font-size: 0.97em;
+    }
+    blockquote > :first-child {
+      margin-top: 0;
+    }
+    blockquote > :last-child {
+      margin-bottom: 0;
     }
 
     hr {
-      @apply border-border;
+      margin-block: 3em;
+      border: 0;
+      border-top: 1px solid var(--line);
     }
 
-    img {
-      @apply mx-auto border border-border;
+    /* ----- Media ----- */
+    img,
+    video {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      margin-inline: auto;
+      border: 1px solid var(--line);
+      border-radius: 0.6rem;
     }
-
+    p:has(> img:only-child) {
+      margin-block: 2em;
+    }
+    figure img {
+      margin-bottom: 0;
+    }
     figcaption {
-      @apply opacity-75;
+      margin-top: 0.75rem;
+      font-family: var(--font-mono);
+      font-stretch: 87.5%;
+      font-size: 0.72rem;
+      letter-spacing: 0.02em;
+      line-height: 1.5;
+      text-transform: uppercase;
+      text-align: center;
+      color: var(--ink-soft);
     }
 
+    /* ----- Inline code ----- */
+    :not(pre) > code {
+      padding: 0.12em 0.36em;
+      border: 1px solid var(--line);
+      border-radius: 0.3rem;
+      background: var(--surface);
+      font-family: var(--font-mono);
+      font-stretch: 87.5%;
+      font-size: 0.8em;
+      font-weight: 450;
+      color: var(--ink);
+      overflow-wrap: anywhere;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+    }
+    :is(h2, h3, h4) code {
+      font-size: 0.9em;
+      font-weight: inherit;
+    }
+    a > code {
+      color: inherit;
+    }
+
+    /* ----- Tables ----- */
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 0.6rem;
+    }
+    .table-wrap table {
+      margin: 0;
+    }
     table {
-      th,
-      td {
-        @apply border border-border p-2;
-      }
-
-      th {
-        @apply py-1.5;
-      }
-
-      code {
-        @apply break-all sm:break-normal;
-      }
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9em;
+      line-height: 1.55;
+    }
+    th,
+    td {
+      padding: 0.6em 0.85em;
+      border-bottom: 1px solid var(--line);
+      text-align: start;
+      vertical-align: top;
+    }
+    tr:last-child td {
+      border-bottom: 0;
+    }
+    td + td,
+    th + th {
+      border-inline-start: 1px solid var(--line);
+    }
+    thead th {
+      background: var(--surface);
+      font-family: var(--font-mono);
+      font-stretch: 87.5%;
+      font-size: 0.78em;
+      font-weight: 550;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--ink);
+      white-space: nowrap;
     }
 
-    code {
-      @apply rounded bg-muted/75 p-1 wrap-break-word text-foreground before:content-none after:content-none;
-    }
-
-    .astro-code code {
-      @apply flex-[1_0_100%] bg-inherit p-0;
-    }
-
-    blockquote {
-      @apply border-s-accent/80 wrap-break-word opacity-80;
-    }
-
+    /* ----- Details (non-TOC) ----- */
     details {
-      @apply inline-block cursor-pointer text-foreground select-none [&_p]:hidden [&_ul]:my-0!;
+      padding: 0.6em 1em;
+      border: 1px solid var(--line);
+      border-radius: 0.6rem;
+      background: var(--surface);
+    }
+    details > summary {
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-stretch: 87.5%;
+      font-size: 0.8em;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    details[open] > summary {
+      margin-bottom: 0.5em;
     }
 
-    summary {
-      @apply focus-visible:no-underline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent focus-visible:outline-dashed;
+    /* ----- Markdown "Table of contents" (remark-toc + remark-collapse) -----
+     * Posts render their own "On this page" navigation (inline details on
+     * small screens, sticky rail on xl), so the in-content copy is redundant
+     * when that exists. Posts without it keep the Markdown TOC, styled. */
+    &[data-has-toc] {
+      #table-of-contents,
+      #table-of-contents + p:empty,
+      #table-of-contents + p:empty + details,
+      #table-of-contents + details {
+        display: none;
+      }
+    }
+    #table-of-contents + p:empty {
+      display: none;
+    }
+    #table-of-contents + p + details,
+    #table-of-contents + details {
+      margin-top: 0;
+    }
+    #table-of-contents ~ details > p:empty {
+      display: none;
     }
 
-    pre {
-      @apply focus-visible:border-transparent focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-dashed;
+    /* ----- Code blocks ----- */
+    .code-block {
+      border: 1px solid var(--line);
+      border-radius: 0.75rem;
+      background: var(--surface);
+      overflow: hidden;
+    }
+    .code-block > pre {
+      margin: 0 !important; /* beats mt-8 added by transformerFileName */
+      border: 0;
+      border-radius: 0;
+    }
+    .code-block__bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      min-height: 2.5rem;
+      padding: 0.35rem 0.4rem 0.35rem 1rem;
+      border-bottom: 1px solid var(--line);
+      font-family: var(--font-mono);
+      font-stretch: 87.5%;
+      font-size: 0.7rem;
+      letter-spacing: 0.02em;
+      line-height: 1.4;
+      color: var(--ink-soft);
+    }
+    .code-block__lang {
+      text-transform: uppercase;
+    }
+    .code-block__file {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-width: 0;
+      color: var(--ink);
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .code-block__file::before {
+      content: "";
+      flex: none;
+      width: 0.45rem;
+      height: 0.45rem;
+      border-radius: 999px;
+      background: var(--marigold);
+    }
+    .copy-code {
+      flex: none;
+      padding: 0.3rem 0.7rem;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      font: inherit;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      transition:
+        color 150ms,
+        border-color 150ms,
+        background-color 150ms;
+    }
+    .copy-code:hover {
+      border-color: var(--line);
+      background: var(--paper);
+      color: var(--ink);
+    }
+    .copy-code[data-copied] {
+      border-color: color-mix(in oklab, var(--cobalt) 40%, transparent);
+      color: var(--cobalt);
     }
   }
 
-  /* ===== Code Blocks & Syntax Highlighting ===== */
+  /* ===== Shiki (dual themes via CSS variables) ===== */
   .astro-code {
-    @apply flex border bg-(--shiki-light-bg) text-(--shiki-light) outline-border [&_span]:text-(--shiki-light);
+    --code-pad-x: 1.15rem;
+    display: block;
+    margin-block: 1.35em;
+    padding: 1rem var(--code-pad-x);
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 0.75rem;
+    background-color: var(--surface) !important;
+    color: var(--shiki-light);
+    font-family: var(--font-mono);
+    font-stretch: 87.5%;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    line-height: 1.75;
+    tab-size: 2;
+    scrollbar-width: thin;
+
+    & code {
+      display: block;
+      min-width: max-content;
+      padding: 0;
+      border: 0;
+      background: none;
+      font: inherit;
+      color: inherit;
+    }
+    & span {
+      color: var(--shiki-light);
+      font-style: var(--shiki-light-font-style, inherit);
+    }
+    &:focus-visible {
+      outline: 2px solid var(--cobalt);
+      outline-offset: -2px;
+    }
+
+    /* No-JS fallback for the file name label from transformerFileName */
+    & > span:not(.line) {
+      display: block;
+      position: static;
+      margin-bottom: 0.75rem;
+      border: 0;
+      background: none;
+      padding: 0;
+    }
+
+    /* ----- Transformers: https://shiki.style/packages/transformers ----- */
+    & .line {
+      display: inline-block;
+      width: calc(100% + var(--code-pad-x) * 2);
+      margin-inline: calc(var(--code-pad-x) * -1);
+      padding-inline: var(--code-pad-x);
+    }
+    & .line.highlighted {
+      background: color-mix(in oklab, var(--marigold) 16%, transparent);
+      box-shadow: inset 2px 0 0 var(--marigold);
+    }
+    & .line.diff {
+      position: relative;
+    }
+    & .line.diff::before {
+      position: absolute;
+      inset-inline-start: 0.4rem;
+      font-weight: 600;
+    }
+    & .line.diff.add {
+      background: color-mix(in oklab, var(--cobalt) 12%, transparent);
+    }
+    & .line.diff.add::before {
+      content: "+";
+      color: var(--cobalt);
+    }
+    & .line.diff.remove {
+      background: color-mix(in oklab, #d0463b 12%, transparent);
+      opacity: 0.8;
+    }
+    & .line.diff.remove::before {
+      content: "-";
+      color: #d0463b;
+    }
+    & .highlighted-word {
+      padding: 0.05em 0.2em;
+      border-radius: 0.25rem;
+      background: color-mix(in oklab, var(--marigold) 22%, transparent);
+      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--marigold) 55%, transparent);
+    }
   }
 
   html[data-theme="dark"] .astro-code {
-    @apply bg-(--shiki-dark-bg) text-(--shiki-dark) [&_span]:text-(--shiki-dark);
+    color: var(--shiki-dark);
+
+    & span {
+      color: var(--shiki-dark);
+      font-style: var(--shiki-dark-font-style, inherit);
+    }
+    & .line.diff.remove {
+      background: color-mix(in oklab, #ff7a6e 12%, transparent);
+    }
+    & .line.diff.remove::before {
+      color: #ff7a6e;
+    }
   }
 
-  /* Styles for Shiki transformers */
-  /* https://shiki.style/packages/transformers */
-  .astro-code {
-    .line.diff.add {
-      @apply relative inline-block w-full bg-green-400/20 before:absolute before:-left-3 before:text-green-500 before:content-['+'];
-    }
-    .line.diff.remove {
-      @apply relative inline-block w-full bg-red-500/20 before:absolute before:-left-3 before:text-red-500 before:content-['-'];
-    }
-    .line.highlighted {
-      @apply inline-block w-full bg-slate-400/20;
-    }
-    .highlighted-word {
-      @apply rounded-sm border border-border px-0.5 py-px;
+  @media (min-width: 640px) {
+    .astro-code {
+      font-size: 0.85rem;
     }
   }
 }

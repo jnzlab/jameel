@@ -11,13 +11,29 @@ const backUrl = SITE.showBackButton ? `${Astro.url.pathname}` : "/";
 
 <Layout title={`Search | ${SITE.title}`}>
   <Header />
-  <Main pageTitle="Search" pageDesc="Search any article ...">
+  <Main
+    pageTitle="Search"
+    pageDesc="Search every post by title, error message, or tool name."
+  >
+    <p class="type-meta mb-4 text-ink-soft">
+      Press <kbd class="search-kbd">⌘K</kbd> or <kbd class="search-kbd">/</kbd> anywhere to search
+    </p>
     <div id="pagefind-search" transition:persist data-backurl={backUrl}></div>
   </Main>
   <Footer />
 </Layout>
 
 <script>
+  function focusSearchInput() {
+    const input = document.querySelector<HTMLInputElement>(
+      ".pagefind-ui__search-input"
+    );
+    // Don't yank focus on touch devices; the keyboard would cover the page
+    if (input && window.matchMedia("(hover: hover)").matches) {
+      input.focus({ preventScroll: true });
+    }
+  }
+
   function initSearch() {
     const pageFindSearch: HTMLElement | null =
       document.querySelector("#pagefind-search");
@@ -32,12 +48,12 @@ const backUrl = SITE.showBackButton ? `${Astro.url.pathname}` : "/";
       // @ts-expect-error — Missing types for @pagefind/default-ui package.
       const { PagefindUI } = await import("@pagefind/default-ui");
 
-      // Display warning inn dev mode
+      // Display warning in dev mode
       if (import.meta.env.DEV) {
         pageFindSearch.innerHTML = `
-            <div class="bg-muted/75 rounded p-4 space-y-4 mb-4">
-              <p><strong>DEV mode Warning! </strong>You need to build the project at least once to see the search results during development.</p>
-              <code class="block bg-black text-white px-2 py-1 rounded">pnpm run build</code>
+            <div class="search-dev-warning">
+              <p><strong>Dev mode:</strong> search results come from the last production build. Run a build at least once to see results here.</p>
+              <code>pnpm run build</code>
             </div>
           `;
       }
@@ -47,6 +63,9 @@ const backUrl = SITE.showBackButton ? `${Astro.url.pathname}` : "/";
         element: "#pagefind-search",
         showImages: false,
         showSubResults: true,
+        translations: {
+          placeholder: "Search posts, errors, tools",
+        },
         processTerm: function (term: string) {
           params.set("q", term); // Update the `q` parameter in the URL
           history.replaceState(history.state, "", "?" + params.toString()); // Push the new URL without reloading
@@ -63,6 +82,8 @@ const backUrl = SITE.showBackButton ? `${Astro.url.pathname}` : "/";
       if (query) {
         search.triggerSearch(query);
       }
+
+      focusSearchInput();
 
       // Reset search param if search input is cleared
       const searchInput = document.querySelector(".pagefind-ui__search-input");
@@ -82,7 +103,10 @@ const backUrl = SITE.showBackButton ? `${Astro.url.pathname}` : "/";
     const pagefindSearch = document.querySelector("#pagefind-search");
 
     // if pagefind search form already exists, don't initialize search component
-    if (pagefindSearch && pagefindSearch.querySelector("form")) return;
+    if (pagefindSearch && pagefindSearch.querySelector("form")) {
+      focusSearchInput();
+      return;
+    }
 
     initSearch();
   });
@@ -90,52 +114,223 @@ const backUrl = SITE.showBackButton ? `${Astro.url.pathname}` : "/";
 </script>
 
 <style is:global>
+  .search-kbd {
+    display: inline-block;
+    min-width: 1.5em;
+    margin-inline: 0.15em;
+    padding: 0.05em 0.4em;
+    border: 1px solid var(--line);
+    border-radius: 0.3rem;
+    background: var(--surface);
+    color: var(--ink);
+    text-align: center;
+    font: inherit;
+  }
+
   #pagefind-search {
-    --pagefind-ui-font: var(--font-app);
-    --pagefind-ui-text: var(--foreground);
-    --pagefind-ui-background: var(--background);
-    --pagefind-ui-border: var(--border);
-    --pagefind-ui-primary: var(--accent);
-    --pagefind-ui-tag: var(--background);
-    --pagefind-ui-border-radius: 0.375rem;
+    --pagefind-ui-scale: 1;
+    --search-h: 4.25rem;
+    --pagefind-ui-font: var(--font-body);
+    --pagefind-ui-text: var(--ink);
+    --pagefind-ui-background: var(--surface);
+    --pagefind-ui-border: var(--line);
+    --pagefind-ui-primary: var(--cobalt);
+    --pagefind-ui-tag: var(--surface);
+    --pagefind-ui-border-radius: 0.75rem;
     --pagefind-ui-border-width: 1px;
     --pagefind-ui-image-border-radius: 8px;
     --pagefind-ui-image-box-ratio: 3 / 2;
 
-    form::before {
-      background-color: var(--foreground);
+    .search-dev-warning {
+      margin-bottom: 1.5rem;
+      padding: 1rem 1.25rem;
+      border: 1px dashed var(--line);
+      border-radius: 0.75rem;
+      color: var(--ink-soft);
+      font-size: 0.95rem;
+
+      code {
+        display: inline-block;
+        margin-top: 0.5rem;
+        padding: 0.15rem 0.5rem;
+        border-radius: 0.35rem;
+        background: var(--surface);
+        color: var(--ink);
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+      }
     }
 
-    input {
+    /* Search field */
+    .pagefind-ui__form::before {
+      background-color: var(--ink-soft);
+      opacity: 1;
+      width: 20px;
+      height: 20px;
+      top: calc(var(--search-h) / 2);
+      translate: 0 -50%;
+      left: 1.35rem;
+    }
+    .pagefind-ui__search-input {
+      height: var(--search-h);
+      padding-inline: 3.5rem 5.5rem;
+      border-color: var(--line);
+      background: var(--surface);
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-size: 1.3rem;
+      font-weight: 500;
+      transition:
+        border-color 150ms,
+        box-shadow 150ms;
+    }
+    .pagefind-ui__search-input::placeholder {
+      color: var(--ink-soft);
+      opacity: 0.8;
+      font-family: var(--font-mono);
+      font-stretch: 87.5%;
+      font-size: 1rem;
       font-weight: 400;
-      border: 1px solid var(--border);
     }
-
-    input:focus-visible {
-      outline: 1px solid var(--accent);
+    .pagefind-ui__search-input:hover {
+      border-color: color-mix(in oklab, var(--ink) 35%, var(--line));
     }
-
-    .pagefind-ui__result-title a {
-      color: var(--accent);
-      outline-offset: 1px;
-      outline-color: var(--accent);
-      text-decoration-style: dashed;
-      text-underline-offset: 4px;
+    .pagefind-ui__search-input:focus-visible,
+    .pagefind-ui__search-input:focus {
+      outline: none;
+      border-color: var(--cobalt);
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--cobalt) 22%, transparent);
     }
-
-    .pagefind-ui__result-title a:focus-visible,
+    .pagefind-ui__search-clear {
+      top: calc(var(--search-h) / 2);
+      right: 0.85rem;
+      height: auto;
+      translate: 0 -50%;
+      padding: 0.3rem 0.7rem;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--ink-soft);
+      font-family: var(--font-mono);
+      font-stretch: 87.5%;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      opacity: 1;
+    }
+    .pagefind-ui__search-clear:hover {
+      color: var(--ink);
+    }
     .pagefind-ui__search-clear:focus-visible {
-      text-decoration-line: none;
-      outline-width: 2px;
-      outline-style: dashed;
+      outline: 2px solid var(--cobalt);
+      outline-offset: 0;
     }
 
+    /* Results */
+    .pagefind-ui__drawer {
+      gap: 0;
+    }
+    .pagefind-ui__message {
+      height: auto;
+      padding: 2rem 0 1rem;
+      color: var(--ink-soft);
+      font-family: var(--font-mono);
+      font-stretch: 87.5%;
+      font-weight: 450;
+      font-size: 0.75rem;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .pagefind-ui__results {
+      padding: 0;
+    }
+    .pagefind-ui__result {
+      padding: 1.5rem 0 1.6rem;
+      border-top: 1px solid var(--line);
+      gap: 0;
+    }
     .pagefind-ui__result:last-of-type {
-      border-bottom: 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .pagefind-ui__result-inner {
+      margin-top: 0;
+    }
+    .pagefind-ui__result-title {
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 1.2rem;
+      line-height: 1.35;
+    }
+    .pagefind-ui__result-title .pagefind-ui__result-link {
+      color: var(--ink);
+      text-decoration: none;
+      background-image: linear-gradient(var(--cobalt), var(--cobalt));
+      background-size: 0% 2px;
+      background-position: 0 100%;
+      background-repeat: no-repeat;
+      transition:
+        background-size 250ms ease,
+        color 150ms;
+    }
+    .pagefind-ui__result-title .pagefind-ui__result-link:hover,
+    .pagefind-ui__result-title .pagefind-ui__result-link:focus-visible {
+      color: var(--cobalt);
+      text-decoration: none;
+      background-size: 100% 2px;
+    }
+    .pagefind-ui__result-excerpt {
+      margin-top: 0.4rem;
+      color: var(--ink-soft);
+      font-size: 0.98rem;
+      line-height: 1.6;
+      min-width: 0;
+    }
+    .pagefind-ui__result mark {
+      padding: 0 0.12em;
+      border-radius: 0.2em;
+      background: color-mix(in oklab, var(--marigold) 32%, transparent);
+      color: var(--ink);
     }
 
-    .pagefind-ui__result-nested .pagefind-ui__result-link:before {
-      font-family: system-ui;
+    /* Sub results (headings inside a post) */
+    .pagefind-ui__result-nested {
+      padding-left: 1.25rem;
+      margin-left: 0.2rem;
+      border-left: 2px solid var(--line);
+    }
+    .pagefind-ui__result-nested:first-of-type {
+      margin-top: 0.9rem;
+      padding-top: 0.25rem;
+    }
+    .pagefind-ui__result-nested .pagefind-ui__result-link {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .pagefind-ui__result-nested .pagefind-ui__result-link::before {
+      content: none;
+    }
+    .pagefind-ui__result-nested .pagefind-ui__result-excerpt {
+      font-size: 0.92rem;
+    }
+
+    /* Load more */
+    .pagefind-ui__button {
+      height: auto;
+      margin-top: 2rem;
+      padding: 0.7rem 1.25rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition:
+        border-color 150ms,
+        color 150ms;
+    }
+    .pagefind-ui__button:hover {
+      border-color: var(--ink);
+      color: var(--cobalt);
     }
   }
 </style>

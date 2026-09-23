@@ -1,229 +1,97 @@
 import satori from "satori";
-// import { html } from "satori-html";
 import { SITE } from "@/config";
 import loadGoogleFonts from "../loadGoogleFont";
+import { C, F, OG, brandRow, graphPanel, h, hostname, meta } from "./shared";
 
-// const markup = html`<div
-//       style={{
-//         background: "#fefbfb",
-//         width: "100%",
-//         height: "100%",
-//         display: "flex",
-//         alignItems: "center",
-//         justifyContent: "center",
-//       }}
-//     >
-//       <div
-//         style={{
-//           position: "absolute",
-//           top: "-1px",
-//           right: "-1px",
-//           border: "4px solid #000",
-//           background: "#ecebeb",
-//           opacity: "0.9",
-//           borderRadius: "4px",
-//           display: "flex",
-//           justifyContent: "center",
-//           margin: "2.5rem",
-//           width: "88%",
-//           height: "80%",
-//         }}
-//       />
+// Title size steps by length so long titles still fit in ~4 lines.
+const titleSize = (title) => {
+  const n = title.length;
+  if (n <= 32) return 76;
+  if (n <= 50) return 64;
+  if (n <= 70) return 54;
+  if (n <= 90) return 46;
+  return 42;
+};
 
-//       <div
-//         style={{
-//           border: "4px solid #000",
-//           background: "#fefbfb",
-//           borderRadius: "4px",
-//           display: "flex",
-//           justifyContent: "center",
-//           margin: "2rem",
-//           width: "88%",
-//           height: "80%",
-//         }}
-//       >
-//         <div
-//           style={{
-//             display: "flex",
-//             flexDirection: "column",
-//             justifyContent: "space-between",
-//             margin: "20px",
-//             width: "90%",
-//             height: "90%",
-//           }}
-//         >
-//           <p
-//             style={{
-//               fontSize: 72,
-//               fontWeight: "bold",
-//               maxHeight: "84%",
-//               overflow: "hidden",
-//             }}
-//           >
-//             {post.data.title}
-//           </p>
-//           <div
-//             style={{
-//               display: "flex",
-//               justifyContent: "space-between",
-//               width: "100%",
-//               marginBottom: "8px",
-//               fontSize: 28,
-//             }}
-//           >
-//             <span>
-//               by{" "}
-//               <span
-//                 style={{
-//                   color: "transparent",
-//                 }}
-//               >
-//                 "
-//               </span>
-//               <span style={{ overflow: "hidden", fontWeight: "bold" }}>
-//                 {post.data.author}
-//               </span>
-//             </span>
+const formatDate = (date) =>
+  new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    timeZone: SITE.timezone || "UTC",
+  }).format(date);
 
-//             <span style={{ overflow: "hidden", fontWeight: "bold" }}>
-//               {SITE.title}
-//             </span>
-//           </div>
-//         </div>
-//       </div>
-//     </div>`;
+export default async (post) => {
+  const { title, author = SITE.author, pubDatetime, modDatetime } = post.data;
+  const domain = hostname(SITE.website);
+  const date = formatDate(new Date(modDatetime ?? pubDatetime));
+  const size = titleSize(title);
 
-export default async post => {
   return satori(
-    {
-      type: "div",
-      props: {
-        style: {
-          background: "#fefbfb",
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        },
-        children: [
-          {
-            type: "div",
-            props: {
-              style: {
-                position: "absolute",
-                top: "-1px",
-                right: "-1px",
-                border: "4px solid #000",
-                background: "#ecebeb",
-                opacity: "0.9",
-                borderRadius: "4px",
-                display: "flex",
-                justifyContent: "center",
-                margin: "2.5rem",
-                width: "88%",
-                height: "80%",
-              },
-            },
-          },
-          {
-            type: "div",
-            props: {
-              style: {
-                border: "4px solid #000",
-                background: "#fefbfb",
-                borderRadius: "4px",
-                display: "flex",
-                justifyContent: "center",
-                margin: "2rem",
-                width: "88%",
-                height: "80%",
-              },
-              children: {
-                type: "div",
-                props: {
-                  style: {
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    margin: "20px",
-                    width: "90%",
-                    height: "90%",
-                  },
-                  children: [
-                    {
-                      type: "p",
-                      props: {
-                        style: {
-                          fontSize: 72,
-                          fontWeight: "bold",
-                          maxHeight: "84%",
-                          overflow: "hidden",
-                        },
-                        children: post.data.title,
-                      },
-                    },
-                    {
-                      type: "div",
-                      props: {
-                        style: {
-                          display: "flex",
-                          justifyContent: "space-between",
-                          width: "100%",
-                          marginBottom: "8px",
-                          fontSize: 28,
-                        },
-                        children: [
-                          {
-                            type: "span",
-                            props: {
-                              children: [
-                                "by ",
-                                {
-                                  type: "span",
-                                  props: {
-                                    style: { color: "transparent" },
-                                    children: '"',
-                                  },
-                                },
-                                {
-                                  type: "span",
-                                  props: {
-                                    style: {
-                                      overflow: "hidden",
-                                      fontWeight: "bold",
-                                    },
-                                    children: post.data.author,
-                                  },
-                                },
-                              ],
-                            },
-                          },
-                          {
-                            type: "span",
-                            props: {
-                              style: { overflow: "hidden", fontWeight: "bold" },
-                              children: SITE.title,
-                            },
-                          },
-                        ],
-                      },
-                    },
-                  ],
-                },
-              },
-            },
-          },
-        ],
+    h(
+      "div",
+      {
+        width: "100%",
+        height: "100%",
+        background: C.paper,
+        color: C.ink,
       },
-    },
+      [
+        h(
+          "div",
+          {
+            flex: 1,
+            flexDirection: "column",
+            justifyContent: "space-between",
+            padding: "60px 72px 56px",
+          },
+          [
+            brandRow(domain, "Writing"),
+            h(
+              "div",
+              {
+                // short titles get the wide display cut, like page titles
+                fontFamily: title.length <= 32 ? F.display : F.mono,
+                fontSize: size,
+                lineHeight: 1.12,
+                letterSpacing: "-0.035em",
+                maxHeight: size * 1.12 * 4,
+                overflow: "hidden",
+              },
+              title,
+            ),
+            h(
+              "div",
+              {
+                alignItems: "center",
+                justifyContent: "space-between",
+                paddingTop: 22,
+                borderTop: `2px solid ${C.line}`,
+              },
+              [
+                h(
+                  "div",
+                  {
+                    fontFamily: F.body,
+                    fontWeight: 500,
+                    fontSize: 28,
+                    color: C.ink,
+                  },
+                  author,
+                ),
+                meta(date),
+              ],
+            ),
+          ],
+        ),
+        graphPanel({ variant: "log" }),
+      ],
+    ),
     {
-      width: 1200,
-      height: 630,
+      width: OG.width,
+      height: OG.height,
       embedFont: true,
-      fonts: await loadGoogleFonts(
-        post.data.title + post.data.author + SITE.title + "by"
-      ),
-    }
+      fonts: await loadGoogleFonts(title + author + domain + date + "Writing/"),
+    },
   );
 };

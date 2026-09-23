@@ -1,0 +1,20 @@
+---
+/**
+ * Brand mark: the main line with a branch forking off it. The main line's
+ * latest commit sits beside the branch head, which is marked in marigold.
+ * Mirrors the commit-graph motif used across the site. Themes via CSS vars.
+ */
+type Props = { class?: string };
+const { class: className = "" } = Astro.props;
+---
+
+<svg viewBox="0 0 32 32" fill="none" aria-hidden="true" class={className}>
+  <rect width="32" height="32" rx="8" fill="var(--ink)"></rect>
+  <path
+    d="M10.5 11.5V25M21 13v1c0 6-10.5 4.5-10.5 10"
+    stroke="var(--paper)"
+    stroke-width="2.75"
+    stroke-linecap="round"></path>
+  <circle cx="10.5" cy="11.5" r="3.25" fill="var(--paper)"></circle>
+  <circle cx="21" cy="11.5" r="4.25" fill="var(--marigold)"></circle>
+</svg>

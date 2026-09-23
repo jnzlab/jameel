@@ -5,29 +5,56 @@ import { SITE } from "@/config";
 type StringTitle = { pageTitle: string };
 type ArrayTitle = { pageTitle: [string, string]; titleTransition: string };
 
-type Props = (StringTitle | ArrayTitle) & { pageDesc?: string };
+type Props = (StringTitle | ArrayTitle) & {
+  pageDesc?: string;
+  /** Short summary shown in meta type, e.g. "9 posts · 30 tags". */
+  count?: string;
+};
 
 const { props } = Astro;
 
 const backUrl = SITE.showBackButton ? Astro.url.pathname : "/";
 ---
 
-<Breadcrumb />
-<main data-backUrl={backUrl} id="main-content" class="app-layout pb-4">
-  {
-    "titleTransition" in props ? (
-      <h1 class="text-2xl font-semibold sm:text-3xl">
-        {props.pageTitle[0]}
-        <span transition:name={props.titleTransition}>
-          {props.pageTitle[1]}
-        </span>
-      </h1>
-    ) : (
-      <h1 class="text-2xl font-semibold sm:text-3xl">{props.pageTitle}</h1>
-    )
-  }
-  <p class="mt-2 mb-6 italic">{props.pageDesc}</p>
-  <slot />
+<main
+  data-backUrl={backUrl}
+  id="main-content"
+  class="app-layout flex-1 pb-24"
+>
+  <header class="page-header border-b border-line pt-10 pb-10 sm:pt-14 sm:pb-12">
+    <Breadcrumb bare />
+    {
+      "titleTransition" in props ? (
+        <h1 class="type-display mt-6 text-[clamp(2.25rem,6.5vw,3.5rem)] break-words">
+          {props.pageTitle[0]}{" "}
+          <span transition:name={props.titleTransition} class="inline-block">
+            <span class="text-ink-soft" aria-hidden="true">#</span>{props.pageTitle[1]}
+          </span>
+        </h1>
+      ) : (
+        <h1 class="type-display mt-6 text-[clamp(2.25rem,6.5vw,3.5rem)]">
+          {props.pageTitle}
+        </h1>
+      )
+    }
+    {
+      (props.pageDesc || props.count) && (
+        <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-10">
+          {props.pageDesc && (
+            <p class="max-w-2xl text-lg leading-relaxed text-ink-soft">
+              {props.pageDesc}
+            </p>
+          )}
+          {props.count && (
+            <p class="type-meta shrink-0 text-ink-soft">{props.count}</p>
+          )}
+        </div>
+      )
+    }
+  </header>
+  <div class="pt-10 sm:pt-12">
+    <slot />
+  </div>
 </main>
 
 <script>

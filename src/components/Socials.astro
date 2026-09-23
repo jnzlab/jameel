@@ -1,21 +1,44 @@
 ---
+/**
+ * Compact row of profile links (email excluded: the footer owns contact).
+ * Optionally ends with the RSS feed.
+ */
+import IconRss from "@/assets/icons/IconRss.svg";
 import { SOCIALS } from "@/constants";
-import LinkButton from "./LinkButton.astro";
+
+type Props = { class?: string; rss?: boolean };
+
+const { class: className, rss = false } = Astro.props;
+const profiles = SOCIALS.filter(s => s.name !== "Mail");
+const linkClass =
+  "inline-flex items-center gap-1.5 py-1 text-sm font-medium text-ink-soft transition-colors hover:text-ink";
 ---
 
-<div class="flex flex-wrap items-center gap-1">
+<ul class:list={["flex flex-wrap items-center gap-x-5 gap-y-1", className]}>
   {
-    SOCIALS.map(social => (
-      <LinkButton
-        href={social.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="p-2 hover:rotate-6 sm:p-1"
-        title={social.linkTitle}
-      >
-        <social.icon class="inline-block size-6 scale-125 fill-transparent stroke-current stroke-2 opacity-90 group-hover:fill-transparent sm:scale-110" />
-        <span class="sr-only">{social.linkTitle}</span>
-      </LinkButton>
+    profiles.map(social => (
+      <li>
+        <a
+          href={social.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          class={linkClass}
+          title={social.linkTitle}
+        >
+          <social.icon class="size-4" aria-hidden="true" />
+          {social.name}
+        </a>
+      </li>
     ))
   }
-</div>
+  {
+    rss && (
+      <li>
+        <a href="/rss.xml" class={linkClass} title="Subscribe to the RSS feed">
+          <IconRss class="size-4" aria-hidden="true" />
+          RSS
+        </a>
+      </li>
+    )
+  }
+</ul>

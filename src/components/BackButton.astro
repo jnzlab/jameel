@@ -1,34 +1,62 @@
 ---
-import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
-import LinkButton from "./LinkButton.astro";
+/**
+ * Breadcrumb-style back link for post pages. Points at the page the reader
+ * came from (sessionStorage "backUrl", set by list pages), falling back to
+ * the writing index for readers arriving from search engines.
+ */
+import IconArrowLeft from "@/assets/icons/IconArrowLeft.svg";
 import { SITE } from "@/config";
+
+type Props = { class?: string };
+
+const { class: className = "" } = Astro.props;
 ---
 
 {
   SITE.showBackButton && (
-    <div class="app-layout flex items-center justify-start">
-      <LinkButton
+    <nav aria-label="Breadcrumb" class:list={["type-meta", className]} data-pagefind-ignore>
+      <a
         id="back-button"
-        href="/"
-        class="focus-outline -ms-2 mt-8 mb-2 hover:text-foreground/75"
+        href="/posts/"
+        class="group -ms-1 inline-flex items-center gap-2 rounded-full py-1 ps-1 pe-2 text-ink-soft transition-colors hover:text-ink"
       >
-        <IconChevronLeft class="inline-block size-6 rtl:rotate-180" />
-        <span>Go back</span>
-      </LinkButton>
-    </div>
+        <IconArrowLeft
+          class="size-3.5 transition-transform duration-200 group-hover:-translate-x-0.5 rtl:rotate-180"
+          aria-hidden="true"
+        />
+        <span>
+          <span class="sr-only">Back to </span>
+          <span id="back-button-label">Writing</span>
+        </span>
+      </a>
+    </nav>
   )
 }
 
 <script>
-  /* Update Search Praam */
-  function updateGoBackUrl() {
-    const backButton: HTMLAnchorElement | null =
-      document.querySelector("#back-button");
+  /** Label the destination so the link reads like a breadcrumb. */
+  function labelFor(url: string) {
+    const path = url.split("?")[0].replace(/\/+$/, "") || "/";
+    if (path === "/") return "Home";
+    if (path.startsWith("/search")) return "Search results";
+    if (path.startsWith("/archives")) return "Archive";
+    if (path.startsWith("/tags/")) {
+      const tag = path.split("/")[2];
+      return tag ? `#${decodeURIComponent(tag)}` : "Tags";
+    }
+    if (path.startsWith("/tags")) return "Tags";
+    if (path.startsWith("/about")) return "About";
+    return "Writing";
+  }
 
+  function updateGoBackUrl() {
+    const backButton = document.querySelector<HTMLAnchorElement>("#back-button");
+    const label = document.querySelector<HTMLElement>("#back-button-label");
     const backUrl = sessionStorage.getItem("backUrl");
 
     if (backUrl && backButton) {
       backButton.href = backUrl;
+      if (label) label.textContent = labelFor(backUrl);
     }
   }
 

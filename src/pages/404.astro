@@ -2,29 +2,168 @@
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
-import LinkButton from "@/components/LinkButton.astro";
 import { SITE } from "@/config";
 ---
 
-<Layout title={`404 Not Found | ${SITE.title}`}>
+<Layout title={`Page not found | ${SITE.title}`}>
   <Header />
 
+  <!-- Fills exactly one screen below the h-16 sticky header; the footer starts at the fold -->
   <main
     id="main-content"
-    class="app-layout flex flex-1 items-center justify-center"
+    class="app-layout flex min-h-[calc(100svh-4rem)] flex-1 flex-col justify-center py-12 sm:py-16 [@media(max-height:760px)]:py-6"
   >
-    <div class="mb-14 flex flex-col items-center justify-center">
-      <h1 class="text-9xl font-bold text-accent">404</h1>
-      <span aria-hidden="true">¯\_(ツ)_/¯</span>
-      <p class="mt-4 text-2xl sm:text-3xl">Page Not Found</p>
-      <LinkButton
-        href="/"
-        class="my-6 text-lg underline decoration-dashed underline-offset-8"
-      >
-        Go back home
-      </LinkButton>
+    <figure class="lost-graph mx-auto w-full max-w-md" aria-hidden="true">
+      <svg viewBox="84 0 400 190" fill="none" class="w-full overflow-visible">
+        <!-- main line -->
+        <path class="g-line" d="M88 150H480" />
+        <!-- branch that goes nowhere -->
+        <path class="g-line" d="M128 150C128 96 146 70 180 70H320" />
+        <path class="g-dash" d="M320 70H403" />
+
+        <!-- commits on main -->
+        <circle class="g-node" cx="128" cy="150" r="7" />
+        <circle class="g-node" cx="224" cy="150" r="7" />
+        <circle class="g-node" cx="320" cy="150" r="7" />
+        <circle class="g-node g-node--head" cx="416" cy="150" r="7" />
+
+        <!-- commits on the branch share the main line's columns (96-unit grid) -->
+        <circle class="g-node" cx="224" cy="70" r="7" />
+        <circle class="g-node" cx="320" cy="70" r="7" />
+
+        <!-- the broken node: a commit split in two -->
+        <g class="g-broken" transform="translate(416 70)">
+          <path d="M-2 -11A11 11 0 0 0 -2 11" />
+          <path d="M3 -11A11 11 0 0 1 3 11" />
+          <path class="g-crack" d="M0.5 -15L-1.5 -4L2 2L0 15" />
+        </g>
+
+        <!-- labels -->
+        <text class="g-label" x="416" y="182" text-anchor="middle">main</text>
+        <g class="g-tag" transform="translate(416 22)">
+          <rect x="-54" y="-11" width="108" height="22" rx="11" />
+          <text class="g-label g-label--tag" x="0" y="3.6" text-anchor="middle">
+            HEAD detached
+          </text>
+        </g>
+        <path class="g-pin" d="M416 34V56" />
+      </svg>
+    </figure>
+
+    <div class="mx-auto mt-12 max-w-2xl text-center sm:mt-16">
+      <p class="type-meta text-ink-soft">
+        Error 404<span class="lost-path-wrap hidden">
+          · <span id="lost-path" class="normal-case"></span></span
+        >
+      </p>
+      <h1 class="type-display mt-4 text-[clamp(2.1rem,6vw,3.5rem)]">
+        This page doesn't exist
+      </h1>
+      <p class="mx-auto mt-5 max-w-lg text-lg leading-relaxed text-ink-soft">
+        The link may be old, or the address has a typo. The post might also
+        have moved in a site update. Try one of these instead.
+      </p>
+
+      <ul class="mt-9 flex flex-wrap items-center justify-center gap-3">
+        <li><a href="/" class="btn btn-primary">Go home</a></li>
+        <li><a href="/posts/" class="btn btn-ghost">Read the writing</a></li>
+        <li><a href="/search/" class="btn btn-ghost">Search posts</a></li>
+      </ul>
     </div>
   </main>
 
   <Footer />
 </Layout>
+
+<script>
+  function showLostPath() {
+    const target = document.querySelector("#lost-path");
+    const wrap = document.querySelector(".lost-path-wrap");
+    const path = window.location.pathname;
+    if (!target || !wrap || path === "/404" || path === "/404/") return;
+    target.textContent = path.length > 40 ? `${path.slice(0, 39)}…` : path;
+    wrap.classList.remove("hidden");
+  }
+  showLostPath();
+  document.addEventListener("astro:after-swap", showLostPath);
+</script>
+
+<style>
+  .g-line {
+    stroke: var(--line);
+    stroke-width: 2.5;
+  }
+  .g-dash {
+    stroke: var(--ink-soft);
+    stroke-width: 2.5;
+    stroke-dasharray: 4 7;
+    stroke-linecap: round;
+    opacity: 0.6;
+  }
+  .g-node {
+    fill: var(--paper);
+    stroke: var(--ink);
+    stroke-width: 2.5;
+  }
+  .g-node--head {
+    fill: var(--marigold);
+    stroke: var(--marigold);
+  }
+  .g-broken path {
+    stroke: var(--ink);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+  }
+  .g-broken .g-crack {
+    stroke: var(--paper);
+    stroke-width: 3;
+  }
+  .g-tag rect {
+    fill: var(--ink);
+  }
+  .g-pin {
+    stroke: var(--ink);
+    stroke-width: 1.5;
+    stroke-dasharray: 2 3;
+  }
+  .g-label {
+    fill: var(--ink-soft);
+    font-family: var(--font-mono);
+    font-stretch: 87.5%;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .g-label--tag {
+    fill: var(--paper);
+    font-weight: 600;
+  }
+
+  /* One entrance: the branch dashes creep toward the broken commit */
+  @media (prefers-reduced-motion: no-preference) {
+    .g-dash {
+      animation: g-creep 1.6s ease-out both;
+    }
+    .g-broken {
+      animation: g-appear 400ms ease-out 1.1s both;
+    }
+  }
+  @keyframes g-creep {
+    from {
+      stroke-dashoffset: 60;
+      opacity: 0;
+    }
+    to {
+      stroke-dashoffset: 0;
+      opacity: 0.6;
+    }
+  }
+  @keyframes g-appear {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+</style>

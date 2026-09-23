@@ -1,0 +1,152 @@
+---
+/**
+ * Selected work as large rows. GitHub metadata (language, last push) is
+ * optional garnish: rows are complete without it.
+ */
+import type { Project } from "@/data/projects";
+import type { GitHubRepoDetail } from "@/utils/github";
+
+type Props = {
+  projects: readonly Project[];
+  repos: GitHubRepoDetail[];
+};
+
+const { projects, repos } = Astro.props;
+
+const repoFor = (project: Project) =>
+  project.repo
+    ? repos.find(
+        r =>
+          r.fullName.toLowerCase() ===
+          `${project.repo?.owner}/${project.repo?.repo}`.toLowerCase()
+      )
+    : undefined;
+
+const updated = (iso: string | null) => {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toLocaleDateString("en-GB", { month: "short", year: "numeric" });
+};
+
+const statusLabel = { live: "Live", published: "Published" } as const;
+const host = (href: string) => new URL(href).host.replace(/^www\./, "");
+---
+
+<ul class="border-t border-line">
+  {
+    projects.map(project => {
+      const repo = repoFor(project);
+      const pushed = repo ? updated(repo.pushedAt) : null;
+      return (
+        <li class="work-row group relative border-b border-line py-10 sm:py-12">
+          <p class="type-meta flex flex-wrap items-center gap-x-3 gap-y-1 text-ink-soft">
+            <span class="inline-flex items-center gap-1.5 text-ink">
+              <span class="size-1.5 rounded-full bg-marigold" aria-hidden="true" />
+              {statusLabel[project.status]}
+            </span>
+            <span>{project.kind}</span>
+            {repo?.language && <span>{repo.language}</span>}
+            {pushed && <span>Updated {pushed}</span>}
+          </p>
+
+          <h3 class="mt-4">
+            <a
+              href={project.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="work-link type-heading text-[1.9rem] leading-[1.1] sm:text-[2.6rem]"
+            >
+              <span class="work-name">{project.name}</span>
+              <span class="work-arrow inline-block text-[0.6em]" aria-hidden="true">↗</span>
+              <span class="sr-only">(opens {host(project.href)} in a new tab)</span>
+            </a>
+          </h3>
+
+          <div class="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-12">
+            <p class="text-[1.075rem] text-ink-soft sm:text-[1.15rem]">
+              {project.summary}
+            </p>
+            <div>
+              <p class="proof font-mono text-[0.8rem] leading-[1.7] text-ink">
+                {project.proof}
+              </p>
+              <ul class="mt-4 flex flex-wrap gap-1.5" aria-label={`${project.name} stack`}>
+                {project.stack.map(tech => (
+                  <li class="chip">{tech}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </li>
+      );
+    })
+  }
+</ul>
+
+<style>
+  .work-link {
+    color: var(--ink);
+    transition: color 150ms;
+  }
+  /* stretch the link over the whole row */
+  .work-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+  .work-row:hover .work-link,
+  .work-link:focus-visible {
+    color: var(--cobalt);
+  }
+  .work-link:focus-visible {
+    outline: none;
+  }
+  .work-row:has(.work-link:focus-visible) {
+    outline: 2px solid var(--cobalt);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+  .work-arrow {
+    color: var(--cobalt);
+    opacity: 0;
+    translate: -0.3em 0.15em;
+    transition:
+      opacity 200ms ease,
+      translate 200ms ease;
+  }
+  .work-row:hover .work-arrow,
+  .work-link:focus-visible .work-arrow {
+    opacity: 1;
+    translate: 0 0;
+  }
+  @media (hover: none) {
+    .work-arrow {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
+  /* The build detail reads as a commit annotation hanging off a branch */
+  .proof {
+    position: relative;
+    font-stretch: 87.5%;
+    padding-inline-start: 1.1rem;
+    border-inline-start: 2px solid var(--line);
+  }
+  .proof::before {
+    content: "";
+    position: absolute;
+    top: 0.55em;
+    left: -5px;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--paper);
+    border: 2px solid var(--ink-soft);
+  }
+  .work-row:hover .proof::before {
+    background: var(--marigold);
+    border-color: var(--marigold);
+  }
+</style>

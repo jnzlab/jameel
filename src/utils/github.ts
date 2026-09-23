@@ -1,4 +1,9 @@
-import type { PortfolioRepoRef } from "@/data/portfolioGithubRepos";
+export type PortfolioRepoRef = {
+  owner: string;
+  repo: string;
+  /** Optional homepage that overrides the repo's GitHub homepage. */
+  homepage?: string;
+};
 
 export type GitHubRepoDetail = {
   name: string;
@@ -52,10 +57,15 @@ function apiHeaders(token?: string): Record<string, string> {
 async function fetchOneRepo(
   ref: PortfolioRepoRef,
   headers: Record<string, string>,
+  token?: string,
 ): Promise<GitHubRepoDetail | null> {
   const url = `https://api.github.com/repos/${encodeURIComponent(ref.owner)}/${encodeURIComponent(ref.repo)}`;
   const res = await fetch(url, { headers });
   if (!res.ok) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[github] ${ref.owner}/${ref.repo}: ${res.status} ${res.statusText}${token ? "" : " (no GITHUB_TOKEN set)"}`,
+    );
     return null;
   }
   const json = (await res.json()) as GitHubRepoSingleApi;
@@ -73,6 +83,6 @@ export async function getGitHubReposCurated(
   options?: { token?: string },
 ): Promise<GitHubRepoDetail[]> {
   const headers = apiHeaders(options?.token);
-  const results = await Promise.all(refs.map(ref => fetchOneRepo(ref, headers)));
+  const results = await Promise.all(refs.map(ref => fetchOneRepo(ref, headers, options?.token)));
   return results.filter((r): r is GitHubRepoDetail => r !== null);
 }

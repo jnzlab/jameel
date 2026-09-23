@@ -1,32 +1,80 @@
 ---
 import type { HTMLAttributes } from "astro/types";
-import Socials from "./Socials.astro";
-
-const currentYear = new Date().getFullYear();
+import IconRss from "@/assets/icons/IconRss.svg";
+import { SITE } from "@/config";
+import { SOCIALS } from "@/constants";
 
 type Props = {
   noMarginTop?: boolean;
 } & HTMLAttributes<"footer">;
 
 const { noMarginTop = false, class: className, ...attrs } = Astro.props;
+
+const currentYear = new Date().getFullYear();
+const email = SOCIALS.find(s => s.name === "Mail")?.href.replace("mailto:", "");
+const profiles = SOCIALS.filter(s => s.name !== "Mail");
 ---
 
 <footer
-  class:list={["app-layout", { "mt-auto": !noMarginTop }, className]}
+  class:list={["border-t border-line", { "mt-auto": !noMarginTop }, className]}
   {...attrs}
 >
-  <div
-    class:list={[
-      "py-6 sm:py-4",
-      "border-t border-border",
-      "flex flex-col items-center justify-between sm:flex-row-reverse",
-    ]}
-  >
-    <Socials />
-    <div class="my-2 flex flex-col items-center whitespace-nowrap sm:flex-row">
-      <span>Copyright &#169; {currentYear}</span>
-      <span class="hidden sm:inline">&nbsp;|&nbsp;</span>
-      <span>All rights reserved.</span>
+  <div class="app-layout grid gap-12 py-16 md:grid-cols-[1fr_auto] md:items-end">
+    <div>
+      <p class="type-meta text-ink-soft">Contact</p>
+      {
+        email && (
+          <a
+            href={`mailto:${email}`}
+            class="type-heading mt-3 inline-block text-[clamp(1.4rem,4.2vw,2.75rem)] break-all underline decoration-marigold decoration-[3px] underline-offset-[0.18em] transition-colors hover:text-cobalt"
+          >
+            {email}
+          </a>
+        )
+      }
+      <p class="mt-4 max-w-md text-ink-soft">
+        Open to freelance projects and full-time roles building full-stack and
+        AI-powered products.
+      </p>
     </div>
+
+    <ul class="flex flex-wrap gap-x-6 gap-y-2 md:flex-col md:items-end">
+      {
+        profiles.map(social => (
+          <li>
+            <a
+              href={social.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group inline-flex items-center gap-2 font-medium text-ink-soft transition-colors hover:text-ink"
+              title={social.linkTitle}
+            >
+              <social.icon class="size-[1.1rem]" aria-hidden="true" />
+              {social.name}
+              <span aria-hidden="true" class="text-xs transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">↗</span>
+            </a>
+          </li>
+        ))
+      }
+      <li>
+        <a
+          href="/rss.xml"
+          class="inline-flex items-center gap-2 font-medium text-ink-soft transition-colors hover:text-ink"
+        >
+          <IconRss class="size-[1.1rem]" aria-hidden="true" />
+          RSS feed
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="app-layout type-meta flex flex-wrap justify-between gap-2 border-t border-line py-6 text-ink-soft">
+    <span>© {currentYear} {SITE.author}</span>
+    <span>
+      Built with Astro ·
+      <a href="https://github.com/jnzlab/jameel" target="_blank" rel="noopener noreferrer" class="link-ink">
+        source
+      </a>
+    </span>
   </div>
 </footer>

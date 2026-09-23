@@ -1,0 +1,333 @@
+---
+/**
+ * Signature element: posts (and optionally career milestones) drawn as a git
+ * commit graph. Posts sit on the main line; milestones branch off onto a side
+ * lane. Featured posts are marigold nodes. Rows are grouped under year "tags".
+ */
+import type { CollectionEntry } from "astro:content";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+import { getPath } from "@/utils/getPath";
+import { readingTime } from "@/utils/readingTime";
+import { slugifyStr } from "@/utils/slugify";
+import type { Milestone } from "@/data/career";
+import { SITE } from "@/config";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+type Props = {
+  posts: CollectionEntry<"blog">[];
+  milestones?: readonly Milestone[];
+  /** Print a year marker on the rail when the year changes. */
+  groupByYear?: boolean;
+  /** Hide descriptions for a denser list. */
+  compact?: boolean;
+  /** Heading level for post titles. */
+  headingLevel?: "h2" | "h3";
+};
+
+const {
+  posts,
+  milestones = [],
+  groupByYear = true,
+  compact = false,
+  headingLevel: Heading = "h3",
+} = Astro.props;
+
+type Row =
+  | { kind: "post"; date: Date; post: CollectionEntry<"blog"> }
+  | { kind: "milestone"; date: Date; milestone: Milestone };
+
+const rows: Row[] = [
+  ...posts.map(post => ({
+    kind: "post" as const,
+    date: post.data.pubDatetime,
+    post,
+  })),
+  ...milestones.map(milestone => ({
+    kind: "milestone" as const,
+    date: milestone.date,
+    milestone,
+  })),
+].sort((a, b) => b.date.getTime() - a.date.getTime());
+
+const fmt = (date: Date, tz?: string, precision: "day" | "month" | "year" = "day") => {
+  const d = dayjs(date).tz(tz || SITE.timezone);
+  if (precision === "year") return d.format("YYYY");
+  if (precision === "month") return d.format("MMM YYYY");
+  return d.format("D MMM");
+};
+
+let lastYear: number | null = null;
+---
+
+<ol class="commit-log relative" data-compact={compact}>
+  {
+    rows.map(row => {
+      const year = dayjs(row.date).tz(SITE.timezone).year();
+      const showYear = groupByYear && year !== lastYear;
+      lastYear = year;
+
+      return (
+        <>
+          {showYear && (
+            <li class="commit-year" aria-hidden="true">
+              <span class="commit-year__label type-meta">{year}</span>
+            </li>
+          )}
+          {row.kind === "post" ? (
+            <li
+              class="commit-row group"
+              data-featured={row.post.data.featured ? "true" : undefined}
+            >
+              <time
+                class="commit-date type-meta text-ink-soft"
+                datetime={row.post.data.pubDatetime.toISOString()}
+              >
+                {fmt(row.post.data.pubDatetime, row.post.data.timezone)}
+                {!groupByYear && (
+                  <span class="block">{year}</span>
+                )}
+              </time>
+              <span class="commit-rail" aria-hidden="true">
+                <span class="commit-node" />
+              </span>
+              <div class="commit-body">
+                <a
+                  href={getPath(row.post.id, row.post.filePath)}
+                  class="commit-link"
+                >
+                  <Heading
+                    class="commit-title"
+                    style={{
+                      viewTransitionName: slugifyStr(
+                        row.post.data.title.replaceAll(".", "-")
+                      ),
+                    }}
+                  >
+                    {row.post.data.title}
+                  </Heading>
+                </a>
+                {!compact && (
+                  <p class="mt-1.5 line-clamp-2 text-[0.97rem] text-ink-soft">
+                    {row.post.data.description}
+                  </p>
+                )}
+                <p class="type-meta mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-ink-soft">
+                  {row.post.data.featured && (
+                    <span class="text-ink">
+                      <span class="me-1 inline-block size-1.5 -translate-y-px rounded-full bg-marigold align-middle" />
+                      Featured
+                    </span>
+                  )}
+                  <span>{readingTime(row.post.body)} min read</span>
+                  {row.post.data.tags.slice(0, 3).map(tag => (
+                    <span>#{tag}</span>
+                  ))}
+                </p>
+              </div>
+            </li>
+          ) : (
+            <li class="commit-row commit-row--branch">
+              <time
+                class="commit-date type-meta text-ink-soft"
+                datetime={row.milestone.date.toISOString()}
+              >
+                {fmt(row.milestone.date, undefined, row.milestone.precision)}
+              </time>
+              <span class="commit-rail" aria-hidden="true">
+                <svg class="commit-branch" viewBox="0 0 28 28" fill="none">
+                  <path d="M1 0c0 12 18 8 18 18" stroke="currentColor" stroke-width="2" />
+                </svg>
+                <span class="commit-node commit-node--branch" />
+              </span>
+              <div class="commit-body">
+                <p class="font-semibold text-ink">
+                  {row.milestone.href ? (
+                    <a href={row.milestone.href} target="_blank" rel="noopener noreferrer" class="link-ink">
+                      {row.milestone.title}
+                    </a>
+                  ) : (
+                    row.milestone.title
+                  )}
+                </p>
+                <p class="type-meta mt-1 text-ink-soft">{row.milestone.detail}</p>
+              </div>
+            </li>
+          )}
+        </>
+      );
+    })
+  }
+</ol>
+
+<style>
+  .commit-log {
+    --date-col: 4.75rem;
+    --rail-col: 2.25rem;
+    --node: 0.8rem;
+    --lane-x: calc(var(--date-col) + var(--rail-col) / 2);
+  }
+
+  /* The main line runs the full height of the list */
+  .commit-log::before {
+    content: "";
+    position: absolute;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    left: var(--lane-x);
+    width: 2px;
+    translate: -50% 0;
+    background: var(--line);
+  }
+
+  .commit-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--date-col) var(--rail-col) minmax(0, 1fr);
+    padding-block: 1.1rem;
+  }
+  .commit-log[data-compact="true"] .commit-row {
+    padding-block: 0.8rem;
+  }
+
+  .commit-date {
+    padding-top: 0.3rem;
+    text-align: end;
+    padding-inline-end: 0.9rem;
+    white-space: nowrap;
+  }
+
+  .commit-rail {
+    position: relative;
+  }
+
+  .commit-node {
+    position: absolute;
+    top: 0.45rem;
+    left: 50%;
+    width: var(--node);
+    height: var(--node);
+    translate: -50% 0;
+    border-radius: 999px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    transition:
+      scale 200ms ease,
+      background-color 200ms ease;
+  }
+  .commit-row[data-featured] .commit-node {
+    background: var(--marigold);
+    border-color: var(--marigold);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--marigold) 25%, transparent);
+  }
+  .commit-row:hover .commit-node {
+    scale: 1.3;
+  }
+
+  /* Milestones branch off to a side lane */
+  .commit-branch {
+    position: absolute;
+    top: -0.4rem;
+    left: 50%;
+    width: 1.75rem;
+    height: 1.75rem;
+    color: var(--line);
+  }
+  .commit-node--branch {
+    left: calc(50% + 1.2rem);
+    top: 0.65rem;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-color: var(--ink-soft);
+    border-radius: 3px;
+    rotate: 45deg;
+  }
+  .commit-row--branch .commit-body {
+    padding-inline-start: 1.6rem;
+  }
+
+  .commit-body {
+    padding-inline-start: 0.5rem;
+    min-width: 0;
+  }
+
+  .commit-link {
+    display: inline;
+    text-decoration: none;
+  }
+  .commit-title {
+    display: inline;
+    font-weight: 650;
+    font-size: 1.14rem;
+    line-height: 1.35;
+    color: var(--ink);
+    background-image: linear-gradient(var(--cobalt), var(--cobalt));
+    background-size: 0% 2px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition:
+      background-size 250ms ease,
+      color 150ms;
+  }
+  .commit-link:hover .commit-title,
+  .commit-link:focus-visible .commit-title {
+    color: var(--cobalt);
+    background-size: 100% 2px;
+  }
+
+  /* Year markers render as a git tag on the rail */
+  .commit-year {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--date-col) var(--rail-col) 1fr;
+    padding-top: 1.5rem;
+    padding-bottom: 0.25rem;
+  }
+  .commit-year:first-child {
+    padding-top: 0;
+  }
+  .commit-year__label {
+    grid-column: 1 / span 2;
+    justify-self: end;
+    translate: calc(50% - var(--rail-col) / 2) 0;
+    position: relative;
+    z-index: 1;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--paper);
+    font-weight: 600;
+  }
+
+  @media (max-width: 639px) {
+    .commit-log {
+      --date-col: 0rem;
+      --rail-col: 1.75rem;
+    }
+    .commit-rail {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+    }
+    .commit-body {
+      grid-column: 3;
+      grid-row: 1;
+    }
+    .commit-date {
+      grid-column: 3;
+      grid-row: 2;
+      text-align: start;
+      padding: 0.35rem 0 0 0.5rem;
+    }
+    .commit-row--branch .commit-date {
+      padding-inline-start: 1.6rem;
+    }
+    .commit-year__label {
+      grid-column: 1 / span 3;
+      justify-self: start;
+      translate: 0 0;
+    }
+  }
+</style>

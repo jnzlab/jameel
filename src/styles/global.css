@@ -1,76 +1,197 @@
+@import "@fontsource-variable/martian-mono/wdth.css";
+@import "@fontsource-variable/hanken-grotesk/index.css";
 @import "tailwindcss";
 @import "./typography.css";
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
+/*
+ * Design tokens — "commit log"
+ * paper    page background        ink       primary text
+ * surface  raised panels          ink-soft  secondary text
+ * line     rules and borders      cobalt    links, actions, focus
+ * marigold graph nodes, highlights, live status (fills only; never body text on paper)
+ */
 :root,
 html[data-theme="light"] {
-  /* System stack: avoids Node fetching fonts.googleapis.com during astro dev/build */
-  --font-google-sans-code: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco,
-    Consolas, "Liberation Mono", monospace;
-  --background: #fdfdfd;
-  --foreground: #282728;
-  --accent: #006cac;
-  --muted: #e6e6e6;
-  --border: #ece9e9;
+  --paper: #eef0ea;
+  --surface: #f7f8f4;
+  --ink: #141a17;
+  --ink-soft: #4a544f;
+  --line: #d3d8d0;
+  --cobalt: #2a45e0;
+  --marigold: #e8a33d;
+  --on-marigold: #141a17;
+  color-scheme: light;
 }
 
 html[data-theme="dark"] {
-  --background: #212737;
-  --foreground: #eaedf3;
-  --accent: #ff6b01;
-  --muted: #343f60;
-  --border: #ab4b08;
+  --paper: #0e1311;
+  --surface: #151c19;
+  --ink: #e3e8e2;
+  --ink-soft: #9aa59f;
+  --line: #26302b;
+  --cobalt: #8a9cff;
+  --marigold: #f0b458;
+  --on-marigold: #0e1311;
+  color-scheme: dark;
 }
 
 @theme inline {
-  --font-app: var(--font-google-sans-code);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-accent: var(--accent);
-  --color-muted: var(--muted);
-  --color-border: var(--border);
+  --font-display: "Martian Mono Variable", ui-monospace, monospace;
+  --font-mono: "Martian Mono Variable", ui-monospace, monospace;
+  --font-body: "Hanken Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-line: var(--line);
+  --color-cobalt: var(--cobalt);
+  --color-marigold: var(--marigold);
+  --color-on-marigold: var(--on-marigold);
+
+  /* Legacy aliases so older utility names keep resolving */
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
+  --color-accent: var(--cobalt);
+  --color-muted: var(--line);
+  --color-border: var(--line);
 }
 
 @layer base {
   * {
-    @apply border-border outline-accent/75;
-    scrollbar-width: auto;
-    scrollbar-color: var(--color-muted) transparent;
+    @apply border-line;
+    scrollbar-color: var(--color-line) transparent;
   }
   html {
-    @apply overflow-y-scroll scroll-smooth;
+    @apply overflow-y-scroll;
+    -webkit-text-size-adjust: 100%;
   }
   body {
-    @apply flex min-h-svh flex-col bg-background font-app text-foreground selection:bg-accent/75 selection:text-background;
+    @apply flex min-h-svh flex-col bg-paper font-body text-ink antialiased;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    font-feature-settings: "ss01", "cv11";
   }
-  p {
-    @apply text-justify;
+  ::selection {
+    background: var(--marigold);
+    color: var(--on-marigold);
   }
-  a,
-  button {
-    @apply outline-offset-1 outline-accent focus-visible:no-underline focus-visible:outline-2 focus-visible:outline-dashed;
+  :focus-visible {
+    outline: 2px solid var(--cobalt);
+    outline-offset: 3px;
+    border-radius: 2px;
   }
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
 }
 
-@utility max-w-app {
-  @apply max-w-3xl;
-}
-
+/* ===== Layout ===== */
 @utility app-layout {
-  @apply mx-auto w-full max-w-app px-4;
+  @apply mx-auto w-full max-w-6xl px-4 sm:px-8;
+}
+
+@utility app-narrow {
+  @apply mx-auto w-full max-w-3xl px-4 sm:px-8;
+}
+
+/* ===== Type roles ===== */
+
+/* Display: Martian Mono, stretched wide. Use for page titles and the hero only. */
+@utility type-display {
+  font-family: var(--font-display);
+  font-stretch: 112.5%;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+}
+
+/* Section headings: Martian Mono at normal width */
+@utility type-heading {
+  font-family: var(--font-display);
+  font-stretch: 100%;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+/* Meta labels: small condensed mono caps (dates, counts, eyebrows) */
+@utility type-meta {
+  font-family: var(--font-mono);
+  font-stretch: 87.5%;
+  font-weight: 450;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+/* ===== Links ===== */
+@utility link-ink {
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(in oklab, var(--cobalt) 45%, transparent);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.2em;
+  transition:
+    color 150ms,
+    text-decoration-color 150ms;
+  &:hover {
+    color: var(--cobalt);
+    text-decoration-color: var(--cobalt);
+  }
+}
+
+/* ===== Buttons ===== */
+@utility btn {
+  @apply inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-[background-color,color,border-color,transform] duration-150 active:translate-y-px;
+}
+@utility btn-primary {
+  @apply bg-ink text-paper hover:bg-cobalt hover:text-white;
+}
+@utility btn-ghost {
+  @apply border border-line text-ink hover:border-ink;
+}
+
+/* ===== Chips (tags, stack) ===== */
+@utility chip {
+  @apply inline-flex items-center rounded-full border border-line px-2.5 py-0.5 text-ink-soft;
+  font-family: var(--font-mono);
+  font-stretch: 87.5%;
+  font-size: 0.72rem;
+  letter-spacing: 0.01em;
 }
 
 .active-nav {
-  @apply underline decoration-wavy decoration-2 underline-offset-8;
+  @apply text-ink;
+  &::after {
+    content: "";
+    @apply absolute inset-x-2 -bottom-0.5 h-0.5 rounded-full bg-marigold;
+  }
 }
 
-/* Source: https://piccalil.li/blog/a-more-modern-css-reset/ */
-/* Anything that has been anchored to should have extra scroll margin */
 :target {
-  scroll-margin-block: 1rem;
+  scroll-margin-block: 6rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -1,0 +1,28 @@
+---
+/**
+ * One row of the About page: a section label in the left column,
+ * content on the right. Collapses to a single column below `lg`.
+ */
+type Props = {
+  id: string;
+  label: string;
+  /** Optional small count or note printed under the label. */
+  note?: string;
+};
+
+const { id, label, note } = Astro.props;
+---
+
+<section
+  id={id}
+  aria-labelledby={`${id}-heading`}
+  class="grid gap-x-12 gap-y-6 border-t border-line pt-10 pb-14 lg:grid-cols-[13rem_minmax(0,1fr)] lg:pt-12 lg:pb-16"
+>
+  <header class="lg:sticky lg:top-24 lg:self-start">
+    <h2 id={`${id}-heading`} class="type-heading text-lg">{label}</h2>
+    {note && <p class="type-meta mt-1.5 text-ink-soft">{note}</p>}
+  </header>
+  <div class="min-w-0">
+    <slot />
+  </div>
+</section>

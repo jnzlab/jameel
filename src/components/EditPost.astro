@@ -23,12 +23,13 @@ const showEditPost =
       target="_blank"
       rel="noopener noreferrer"
       class:list={[
-        "flex justify-baseline gap-1.5 opacity-80 hover:text-accent",
+        "type-meta inline-flex items-center gap-1.5 text-ink-soft transition-colors hover:text-cobalt",
         className,
       ]}
     >
-      <IconEdit class="inline-block" />
+      <IconEdit class="size-4" aria-hidden="true" />
       <span>{SITE.editPost.text}</span>
+      <span class="sr-only">(opens GitHub in a new tab)</span>
     </a>
   )
 }

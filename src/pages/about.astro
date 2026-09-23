@@ -1,0 +1,441 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import AboutSection from "@/components/about/AboutSection.astro";
+import IconDownload from "@/assets/icons/IconDownload.svg";
+import IconMail from "@/assets/icons/IconMail.svg";
+import { projects } from "@/data/projects";
+import { SITE } from "@/config";
+
+const email = "jameel@jnzlab.io";
+
+const contact = [
+  { label: "Email", value: email, href: `mailto:${email}` },
+  { label: "Phone", value: "+92 349 7660082", href: "tel:+923497660082" },
+  { label: "Website", value: "jnzlab.io", href: "https://jnzlab.io/" },
+  {
+    label: "LinkedIn",
+    value: "linkedin.com/in/jnzlab",
+    href: "https://linkedin.com/in/jnzlab",
+  },
+  { label: "GitHub", value: "github.com/jnzlab", href: "https://github.com/jnzlab" },
+];
+
+/*
+ * Project write-ups. The paragraphs are the full text from the resume;
+ * <strong> marks the key technologies.
+ */
+const writeups = [
+  {
+    name: "LucidHire",
+    subtitle: "AI-powered candidate screening platform",
+    body: `Architected and deployed an AI candidate-screening platform on <strong>Vercel</strong> using <strong>Next.js 16</strong>, <strong>Drizzle ORM</strong> on <strong>Neon Postgres</strong> with <strong>pgvector</strong>, and <strong>Google Gemini</strong> via the <strong>Vercel AI SDK</strong> for structured data extraction and semantic search. Built a hybrid ranking pipeline combining HNSW-indexed vector similarity search (768-dim embeddings) with LLM re-ranking, narrowing the candidate pool to a top-20 shortlist before scoring, and a 6-stage async CV processing pipeline with <strong>Trigger.dev</strong> streaming real-time status via <strong>Server-Sent Events</strong>. Implemented multi-tenant architecture with <strong>Clerk</strong> auth, org-scoped RBAC, and plan-based usage enforcement.`,
+  },
+  {
+    name: "Pouch Parlour",
+    subtitle: "E-commerce storefront for phone covers & keychains",
+    body: `Built and deployed a full-stack e-commerce platform on <strong>Cloudflare Workers</strong> (via <strong>OpenNext</strong>) with <strong>Next.js 16</strong>, <strong>Drizzle ORM</strong> on <strong>Cloudflare D1</strong>, and <strong>Cloudflare R2</strong> for image storage. Designed a guest-first checkout flow with post-signup account linking that backfills guest orders to a Clerk account by matching normalized email, and snapshot-based order records that keep order history immutable after catalog edits. Built an admin dashboard with real-time analytics, low-stock alerts, and full CRUD for products, brands, and orders, gated by Clerk-based role middleware. Offloaded image processing to a dedicated Cloudflare Worker using <strong>Photon (Rust/WASM)</strong> for resizing and dual JPEG/WebP encoding, connected via a <strong>Service Binding</strong>, cutting a sample 3.9&nbsp;MB upload to ~314&nbsp;KB (~92% smaller) while capping the longest side at 2000px with Lanczos3 resampling.`,
+  },
+  {
+    name: "easy-ytdlp",
+    subtitle: "CLI tool for simplified media downloads",
+    body: `Built and published a <strong>TypeScript</strong> CLI tool that wraps yt-dlp with an interactive, plain-English question flow, removing the need to memorize CLI flags or install Python. Designed a pure-function flag-building layer that deterministically translates user answers into yt-dlp arguments, shared by both the interactive wizard and a non-interactive flag-driven mode, plus a self-contained binary distribution system that auto-downloads the correct platform binary from GitHub Releases with atomic file replacement. Solved YouTube's JavaScript-challenge (EJS) blocking by building a Node runtime discovery layer that scans nvm installations, and engineered a progress bar that correctly handles YouTube's multi-fragment DASH streams without freezing. Published and maintained on npm.`,
+  },
+  {
+    name: "Hafiz Chaska Point",
+    subtitle: "Live shop-status microsite (production)",
+    body: `Built and deployed a live-status site for a local business, letting customers check in real time whether the shop is open. Designed a two-layer status system: Server Components render status via a 5-second revalidating cache for flash-free SSR, while the client polls with <strong>SWR</strong> for near-real-time updates, with optimistic UI in the admin panel and automatic rollback on failed requests. Implemented a PIN-based admin authorization system using constant-time comparison and IP rate limiting, and <strong>Web Push</strong> notifications (VAPID) with automatic cleanup of dead subscriptions.`,
+  },
+].map(w => {
+  const p = projects.find(project => project.name === w.name);
+  return { ...w, href: p?.href ?? "#", stack: p?.stack ?? [], host: p ? new URL(p.href).host.replace(/^www\./, "") : "" };
+});
+
+const skills = [
+  {
+    area: "Languages & frameworks",
+    items: [
+      "TypeScript",
+      "Next.js (App Router, Server Components, Server Actions)",
+      "React",
+      "Node.js",
+    ],
+  },
+  { area: "Frontend", items: ["Tailwind CSS", "shadcn/ui", "SWR"] },
+  {
+    area: "Backend & data",
+    items: [
+      "Drizzle ORM",
+      "REST API routes",
+      "PostgreSQL (Neon, pgvector)",
+      "Cloudflare D1",
+      "Upstash Redis",
+    ],
+  },
+  { area: "Auth", items: ["Clerk (RBAC)"] },
+  { area: "AI integration", items: ["Vercel AI SDK", "Google Gemini API"] },
+  {
+    area: "Cloud & infrastructure",
+    items: [
+      "Vercel",
+      "Cloudflare Workers (OpenNext)",
+      "Cloudflare R2",
+      "Service Bindings",
+      "Trigger.dev",
+    ],
+  },
+  { area: "Tools", items: ["Git", "GitHub", "Figma", "Notion"] },
+];
+
+const ext = { target: "_blank", rel: "noopener noreferrer" };
+---
+
+<Layout
+  title={`About | ${SITE.title}`}
+  description="Jameel Ahmad is a full-stack developer (Next.js, TypeScript) in Gujranwala, Pakistan, freelancing at Innovorus. Experience, projects, skills, open-source work, and contact details."
+>
+  <Header />
+  <main id="main-content" class="app-layout pb-24">
+    <!-- Intro -->
+    <section
+      aria-labelledby="about-title"
+      class="grid gap-x-12 gap-y-12 pt-12 pb-16 sm:pt-16 lg:grid-cols-[minmax(0,1fr)_20rem] lg:pt-20 lg:pb-20"
+    >
+      <div class="min-w-0">
+        <p class="type-meta text-ink-soft">
+          About · Open to opportunities
+        </p>
+        <h1
+          id="about-title"
+          class="type-display mt-6 max-w-[16ch] text-[clamp(2.1rem,5.6vw,4rem)]"
+        >
+          Full-stack developer, end to end.
+        </h1>
+        <div class="mt-8 max-w-[62ch] space-y-4 text-lg leading-relaxed text-ink-soft">
+          <p>
+            I'm <strong class="font-semibold text-ink">Jameel Ahmad</strong>, a
+            <strong class="font-semibold text-ink">full-stack developer</strong> based in
+            Gujranwala, Punjab, Pakistan. I'm currently a
+            <strong class="font-semibold text-ink">Freelance Full-Stack Developer at
+              <a href="https://www.innovorus.com/" {...ext} class="link-ink">Innovorus</a></strong>
+            (Apr 2025 – present), where I own full-stack development end to end —
+            architecture, backend, database, and deployment — for client web projects
+            at a small studio, working alongside a designer partner who handles client
+            acquisition and UI design.
+          </p>
+          <p>
+            I hold a <strong class="font-semibold text-ink">Bachelor of Computer Science</strong>
+            from <strong class="font-semibold text-ink">GIFT University</strong> (2021–2025)
+            with a <strong class="font-semibold text-ink">CGPA of 3.8/4.0</strong>.
+          </p>
+        </div>
+        <div class="mt-10 flex flex-wrap items-center gap-3">
+          <a href={SITE.resumeUrl} {...ext} class="btn btn-primary">
+            <IconDownload class="size-4" aria-hidden="true" />
+            Download resume
+          </a>
+          <a href={`mailto:${email}`} class="btn btn-ghost">
+            <IconMail class="size-4" aria-hidden="true" />
+            Email me
+          </a>
+        </div>
+      </div>
+
+      <aside
+        aria-label="At a glance"
+        class="self-start rounded-2xl border border-line bg-surface p-6 lg:mt-2"
+      >
+        <dl class="grid gap-5">
+          <div>
+            <dt class="type-meta text-ink-soft">Location</dt>
+            <dd class="mt-1">Gujranwala, Punjab, Pakistan</dd>
+          </div>
+          <div>
+            <dt class="type-meta text-ink-soft">Current role</dt>
+            <dd class="mt-1">
+              Freelance Full-Stack Developer,
+              <a href="https://www.innovorus.com/" {...ext} class="link-ink">Innovorus</a>
+            </dd>
+          </div>
+          <div>
+            <dt class="type-meta text-ink-soft">Education</dt>
+            <dd class="mt-1">
+              Bachelor of Computer Science, GIFT University
+              <span class="block text-sm text-ink-soft">2021–2025 · CGPA 3.8/4.0</span>
+            </dd>
+          </div>
+        </dl>
+        <dl class="mt-6 grid gap-2.5 border-t border-line pt-5 text-[0.95rem]">
+          {
+            contact.map(c => (
+              <div class="grid grid-cols-[4.75rem_minmax(0,1fr)] items-baseline gap-3">
+                <dt class="type-meta text-ink-soft">{c.label}</dt>
+                <dd class="min-w-0 truncate">
+                  <a
+                    href={c.href}
+                    class="link-ink"
+                    {...(c.href.startsWith("http") ? ext : {})}
+                  >
+                    {c.value}
+                  </a>
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+      </aside>
+    </section>
+
+    <!-- Experience -->
+    <AboutSection id="experience" label="Experience">
+      <ol class="timeline">
+        <li class="timeline-row" data-current>
+          <span class="timeline-node" aria-hidden="true"></span>
+          <p class="type-meta text-ink-soft">
+            Apr 2025 – Present · Remote · Sialkot, Punjab
+          </p>
+          <h3 class="type-heading mt-2 text-lg sm:text-xl">
+            Freelance Full-Stack Developer
+            <span class="text-ink-soft">at</span>
+            <a href="https://www.innovorus.com/" {...ext} class="link-ink">Innovorus</a>
+          </h3>
+          <ul class="bullets mt-4 max-w-[64ch] space-y-2 text-ink-soft">
+            <li>
+              Own full-stack development end to end for client web projects at a small
+              studio — architecture, backend, database, and deployment.
+            </li>
+            <li>
+              Work alongside a designer partner who handles client acquisition and UI
+              design.
+            </li>
+          </ul>
+        </li>
+        <li class="timeline-row">
+          <span class="timeline-node timeline-node--edu" aria-hidden="true"></span>
+          <p class="type-meta text-ink-soft">2021 – 2025 · Education</p>
+          <h3 class="type-heading mt-2 text-lg sm:text-xl">
+            Bachelor of Computer Science
+            <span class="text-ink-soft">at</span>
+            GIFT University
+          </h3>
+          <p class="mt-3 text-ink-soft">CGPA: <strong class="font-semibold text-ink">3.8/4.0</strong></p>
+        </li>
+      </ol>
+    </AboutSection>
+
+    <!-- Projects -->
+    <AboutSection id="projects" label="Projects" note={`${writeups.length} shipped`}>
+      <div class="divide-y divide-line">
+        {
+          writeups.map(w => (
+            <article class="project grid gap-3 py-9 first:pt-0 last:pb-0">
+              <header>
+                <h3 class="type-heading text-2xl">
+                  <a href={w.href} {...ext} class="group inline-flex items-baseline gap-2 hover:text-cobalt">
+                    {w.name}
+                    <span
+                      aria-hidden="true"
+                      class="text-base text-ink-soft transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-cobalt"
+                    >
+                      ↗
+                    </span>
+                  </a>
+                </h3>
+                <p class="mt-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <span class="font-medium">{w.subtitle}</span>
+                  <span class="type-meta text-ink-soft normal-case">{w.host}</span>
+                </p>
+              </header>
+              <p class="project-body max-w-[68ch] text-ink-soft" set:html={w.body} />
+              {w.stack.length > 0 && (
+                <ul class="mt-1 flex flex-wrap gap-1.5" aria-label={`${w.name} stack`}>
+                  {w.stack.map(s => (
+                    <li class="chip">{s}</li>
+                  ))}
+                </ul>
+              )}
+            </article>
+          ))
+        }
+      </div>
+    </AboutSection>
+
+    <!-- Skills -->
+    <AboutSection id="skills" label="Skills">
+      <dl class="divide-y divide-line">
+        {
+          skills.map(s => (
+            <div class="grid gap-x-8 gap-y-2.5 py-4 first:pt-0 last:pb-0 sm:grid-cols-[12rem_minmax(0,1fr)]">
+              <dt class="type-meta pt-1 text-ink-soft">{s.area}</dt>
+              <dd class="flex flex-wrap gap-1.5">
+                {s.items.map(item => (
+                  <span class="chip text-ink">{item}</span>
+                ))}
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+    </AboutSection>
+
+    <!-- Open source -->
+    <AboutSection id="open-source" label="Open source" note="Docs fixes upstream">
+      <ul class="grid gap-8">
+        <li class="oss">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <h3 class="type-heading text-lg">Neon</h3>
+            <a href="https://github.com/neondatabase/website/pull/3099" {...ext} class="pr-link">PR #3099</a>
+            <a href="https://github.com/neondatabase/website/pull/3100" {...ext} class="pr-link">PR #3100</a>
+            <span class="merged type-meta">Both merged</span>
+          </div>
+          <p class="mt-2 max-w-[64ch] text-ink-soft">
+            Fixed a function name inconsistency in the Clerk+Neon auth integration docs
+            and a broken import path causing runtime errors.
+          </p>
+        </li>
+        <li class="oss">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <h3 class="type-heading text-lg">Clerk</h3>
+            <a href="https://github.com/clerk/clerk-docs/pull/2434" {...ext} class="pr-link">PR #2434</a>
+          </div>
+          <p class="mt-2 max-w-[64ch] text-ink-soft">
+            Documented Clerk's username validation rules for diagnosing silent
+            <code class="font-mono text-[0.85em] text-ink">422</code> errors during user
+            creation via the Backend SDK; guidance later incorporated into official docs
+            (<a href="https://github.com/clerk/clerk-docs/pull/2603" {...ext} class="link-ink">PR #2603</a>).
+          </p>
+        </li>
+        <li class="oss">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <h3 class="type-heading text-lg">Appwrite</h3>
+            <a href="https://github.com/appwrite/website/pull/1472" {...ext} class="pr-link">PR #1472</a>
+            <span class="merged type-meta">Merged</span>
+          </div>
+          <p class="mt-2 max-w-[64ch] text-ink-soft">
+            Documentation fix merged into the Appwrite website.
+          </p>
+        </li>
+      </ul>
+    </AboutSection>
+
+    <!-- Closing -->
+    <section
+      aria-label="Get in touch"
+      class="grid gap-x-12 gap-y-8 border-t border-line pt-12 lg:grid-cols-[13rem_minmax(0,1fr)] lg:pt-16"
+    >
+      <div class="hidden lg:block" aria-hidden="true"></div>
+      <div>
+        <p class="type-heading max-w-[40ch] text-[clamp(1.15rem,2vw,1.45rem)] leading-snug font-medium">
+          Open to opportunities where I can ship impactful full-stack products and keep
+          growing — especially in AI-augmented workflows and developer tooling.
+        </p>
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+          <a href={`mailto:${email}`} class="btn btn-primary">
+            <IconMail class="size-4" aria-hidden="true" />
+            Email me
+          </a>
+          <a href={SITE.resumeUrl} {...ext} class="btn btn-ghost">
+            <IconDownload class="size-4" aria-hidden="true" />
+            Download resume
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  /* Timeline: same rail + node language as the commit graph */
+  .timeline {
+    --node: 0.8rem;
+    --rail-x: 0.4rem;
+    position: relative;
+    display: grid;
+    gap: 2.5rem;
+  }
+  .timeline::before {
+    content: "";
+    position: absolute;
+    top: 0.6rem;
+    bottom: 0.6rem;
+    left: var(--rail-x);
+    width: 2px;
+    translate: -50% 0;
+    background: var(--line);
+  }
+  .timeline-row {
+    position: relative;
+    padding-inline-start: 2.25rem;
+  }
+  .timeline-node {
+    position: absolute;
+    top: 0.2rem;
+    left: var(--rail-x);
+    width: var(--node);
+    height: var(--node);
+    translate: -50% 0;
+    border-radius: 999px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+  }
+  .timeline-row[data-current] .timeline-node {
+    background: var(--marigold);
+    border-color: var(--marigold);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--marigold) 25%, transparent);
+  }
+  .timeline-node--edu {
+    border-radius: 3px;
+    rotate: 45deg;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-color: var(--ink-soft);
+  }
+
+  .bullets > li {
+    position: relative;
+    padding-inline-start: 1.1rem;
+  }
+  .bullets > li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.72em;
+    width: 0.45rem;
+    height: 2px;
+    background: var(--line);
+  }
+
+  .project-body :global(strong) {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .pr-link {
+    font-family: var(--font-mono);
+    font-stretch: 87.5%;
+    font-size: 0.78rem;
+    padding: 0.15rem 0.6rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--cobalt);
+    transition: border-color 150ms;
+  }
+  .pr-link:hover {
+    border-color: var(--cobalt);
+  }
+  .merged {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--ink-soft);
+  }
+  .merged::before {
+    content: "";
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 999px;
+    background: var(--marigold);
+  }
+</style>
