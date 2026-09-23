@@ -3,7 +3,7 @@ title: How I Fixed Missing H.264 Codecs on a Fresh Fedora Install
 author: Jameel Ahmad
 pubDatetime: 2026-01-09T01:43:00+05:00
 slug: fixing-h264-codec-fedora
-featured: true
+featured: false
 draft: false
 tags:
   - linux

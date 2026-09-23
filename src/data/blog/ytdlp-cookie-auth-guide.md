@@ -3,7 +3,7 @@ title: Overcoming YouTube Authentication Hurdles with yt-dlp
 author: Jameel Ahmad
 pubDatetime: 2026-01-30T03:02:00+05:00
 slug: ytdlp-cookie-auth-guide
-featured: true
+featured: false
 draft: false
 tags:
   - windows

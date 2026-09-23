@@ -3,7 +3,7 @@ title: Your "Server Component" Is Running on the Client (And You Have No Idea)
 author: Jameel Ahmad
 pubDatetime: 2026-04-14T01:00:00+05:00
 slug: server-component-runs-on-client
-featured: true
+featured: false
 draft: false
 tags:
   - nextjs

@@ -5,7 +5,7 @@ export const SITE = {
   desc: "Full-stack developer (Next.js, TypeScript). Freelance at Innovorus; AI candidate screening, e-commerce, CLI tools, and open source—portfolio and blog by Jameel Ahmad.",
   resumeUrl: "https://assets.jnzlab.io/resume.pdf",
   title: "Jameel Ahmad",
-  ogImage: "astropaper-og.jpg",
+  ogImage: "", // empty = use the generated /og.png
   lightAndDarkMode: true,
   postPerIndex: 4,
   postPerPage: 4,

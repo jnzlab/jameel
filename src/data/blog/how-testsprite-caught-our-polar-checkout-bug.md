@@ -3,7 +3,7 @@ title: How TestSprite Helped Me Find a Silent Polar Checkout Bug (and How I Fixe
 author: Jameel Ahmad
 pubDatetime: 2026-04-12T14:00:00+05:00
 slug: testsprite-polar-checkout-bug
-featured: true
+featured: false
 draft: false
 tags:
   - testsprite

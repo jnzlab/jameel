@@ -3,7 +3,7 @@ title: Fixing "No Wi-Fi Adapter Found" on Fedora with Intel AX201
 author: Jameel Ahmad
 pubDatetime: 2026-02-25T20:10:00+05:00
 slug: fixing-wifi-intel-ax201-fedora
-featured: true
+featured: false
 draft: false
 tags:
   - linux
