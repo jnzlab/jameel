@@ -119,7 +119,7 @@ Next.js automatically loads `.env.development` when running `pnpm dev`, and `.en
 
 Populate this file with your local Podman credentials:
 
-```env
+```dotenv
 # Local Podman Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=[http://127.0.0.1:54321](http://127.0.0.1:54321)
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_local_anon_key_from_supabase_start
@@ -130,7 +130,7 @@ DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
 
 Populate this file with your hosted Supabase Cloud project credentials:
 
-```env
+```dotenv
 # Hosted Supabase Production Configuration
 NEXT_PUBLIC_SUPABASE_URL=https://<your-project-ref>.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_production_anon_key

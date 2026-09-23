@@ -72,7 +72,7 @@ Never use a real user's ID for testing. A dedicated test user keeps things isola
 
 Add these to your `.env.local` and your CI environment:
 
-```env
+```dotenv
 CLERK_SECRET_KEY=sk_test_xxxxxxxxxxxxxxxxxxxx
 CLERK_TEST_USER_ID=user_2xxxxxxxxxxxxxxxxxxx
 ```
@@ -240,7 +240,7 @@ export async function setup() {
 
 Add the password to your `.env.local`:
 
-```env
+```dotenv
 CLERK_TEST_PASSWORD=YourStrongPassword123!
 ```
 
