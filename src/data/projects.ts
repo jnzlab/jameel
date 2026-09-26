@@ -29,6 +29,17 @@ export const projects: readonly Project[] = [
     status: "live",
   },
   {
+    name: "Tahir Pilot School",
+    href: "https://tahirpilotschool.com",
+    kind: "School management system",
+    summary:
+      "Complete management system for a Gujranwala school, Playgroup to Matric: admissions, attendance, timetables, results, fees and payroll, with separate portals for admins, teachers and students.",
+    proof:
+      "Marks a teacher enters wait for admin approval before they reach a result card; portraits are cut out on upload with Cloudflare Images, and ID cards print eight to an A4 sheet.",
+    stack: ["Next.js (vinext)", "Cloudflare Workers", "D1", "R2", "Clerk"],
+    status: "live",
+  },
+  {
     name: "Pouch Parlour",
     href: "https://pouchparlour.com",
     kind: "E-commerce storefront",
